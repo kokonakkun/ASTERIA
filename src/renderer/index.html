@@ -1,0 +1,524 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; media-src 'none'; object-src 'none';">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ASTERIA</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="material3.css">
+</head>
+<body data-theme="violet" data-design="material3" data-color-scheme="dark" data-motion="expressive">
+  <div class="ambient" aria-hidden="true">
+    <div class="aurora aurora-one"></div>
+    <div class="aurora aurora-two"></div>
+    <canvas id="starfield"></canvas>
+    <div class="noise"></div>
+  </div>
+
+  <div class="app-shell">
+    <header class="titlebar">
+      <div class="titlebar-brand">
+        <span class="signal-dot"></span>
+        <span>ASTERIA SYSTEM</span>
+        <span class="version">4.0</span>
+      </div>
+      <div class="drag-region"></div>
+      <div class="system-state"><span class="online-dot"></span> LOCAL / SECURE</div>
+      <div class="window-controls">
+        <button type="button" data-window="minimize" aria-label="最小化"><svg viewBox="0 0 24 24"><path d="M6 12h12"/></svg></button>
+        <button type="button" data-window="maximize" aria-label="最大化"><svg viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="1"/></svg></button>
+        <button type="button" class="close-button" data-window="close" aria-label="閉じる"><svg viewBox="0 0 24 24"><path d="m7 7 10 10M17 7 7 17"/></svg></button>
+      </div>
+    </header>
+
+    <div class="workspace">
+      <aside class="sidebar">
+        <button type="button" class="brand-mark" data-nav="dashboard" aria-label="ASTERIA ホーム">
+          <span class="brand-orbit"></span><span class="brand-core"></span>
+        </button>
+        <nav class="primary-nav" aria-label="メインナビゲーション">
+          <button type="button" class="nav-button active" data-nav="dashboard" data-tooltip="ホーム" aria-current="page">
+            <svg viewBox="0 0 24 24"><path d="M4 10.5 12 4l8 6.5V20H4z"/><path d="M9 20v-6h6v6"/></svg>
+            <span class="nav-label">ホーム</span>
+          </button>
+          <button type="button" class="nav-button" data-nav="missions" data-tooltip="ミッション">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
+            <span class="nav-label">ミッション</span>
+          </button>
+          <button type="button" class="nav-button" data-nav="planner" data-tooltip="デイリープラン">
+            <svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4M16 3v4M4 10h16M8 14h3M8 17h6"/></svg>
+            <span class="nav-label">プラン</span>
+          </button>
+          <button type="button" class="nav-button" data-nav="focus" data-tooltip="フォーカス">
+            <svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 9 9"/><path d="M12 7v5l3 2M16 3h5v5"/></svg>
+            <span class="nav-label">集中</span>
+          </button>
+          <button type="button" class="nav-button" data-nav="logbook" data-tooltip="ログブック">
+            <svg viewBox="0 0 24 24"><path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/><path d="M8 20a3 3 0 0 1 0-6h11M9 8h6"/></svg>
+            <span class="nav-label">ログ</span>
+          </button>
+          <button type="button" class="nav-button" data-nav="nexus" data-tooltip="NEXUS">
+            <svg viewBox="0 0 24 24"><path d="M12 3v4M12 17v4M3 12h4M17 12h4"/><circle cx="12" cy="12" r="5"/><path d="m8.5 8.5-3-3m10 10 3 3m0-13-3 3m-7 7-3 3"/></svg>
+            <span class="nav-label">Nexus</span>
+          </button>
+          <button type="button" class="nav-button" data-nav="integrations" data-tooltip="サービス連携">
+            <svg viewBox="0 0 24 24"><path d="M8 12h8M12 8v8"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="12" r="3"/><circle cx="12" cy="6" r="3"/><circle cx="12" cy="18" r="3"/></svg>
+            <span class="nav-label">連携</span>
+          </button>
+          <button type="button" class="nav-button" data-nav="insights" data-tooltip="インサイト">
+            <svg viewBox="0 0 24 24"><path d="M5 20V10M12 20V4M19 20v-7"/><path d="M3 20h18"/></svg>
+            <span class="nav-label">分析</span>
+          </button>
+        </nav>
+        <div class="sidebar-bottom">
+          <button type="button" class="nav-button" id="miniModeButton" data-tooltip="ミニモード">
+            <svg viewBox="0 0 24 24"><rect x="4" y="6" width="16" height="12" rx="2"/><path d="M9 18v2h6v-2"/></svg>
+            <span class="nav-label">ミニ</span>
+          </button>
+          <button type="button" class="nav-button" id="settingsButton" data-tooltip="設定">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.86 2.86-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1V21H9.55v-.09a1.7 1.7 0 0 0-1.1-1.51 1.7 1.7 0 0 0-1.88.34l-.06.06-2.86-2.86.06-.06A1.7 1.7 0 0 0 4.05 15a1.7 1.7 0 0 0-1.5-1H2.4V10h.1A1.7 1.7 0 0 0 4 9a1.7 1.7 0 0 0-.34-1.88l-.06-.06L6.46 4.2l.06.06A1.7 1.7 0 0 0 8.4 4a1.7 1.7 0 0 0 1-1.5v-.1h4.05v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.88-.34l.06-.06 2.86 2.86-.06.06A1.7 1.7 0 0 0 19 8.4a1.7 1.7 0 0 0 1.5 1h.1v4.05h-.1A1.7 1.7 0 0 0 19.4 15z"/></svg>
+            <span class="nav-label">設定</span>
+          </button>
+        </div>
+      </aside>
+
+      <main class="main-area">
+        <section class="view active" id="dashboardView" data-view="dashboard">
+          <div class="page-heading dashboard-heading">
+            <div>
+              <p class="eyebrow" id="dateLabel">SYSTEM DATE</p>
+              <h1><span id="greeting">おはようございます</span>、<button class="name-button" id="profileName">Explorer</button><span class="period">.</span></h1>
+              <p class="subtitle">静かな集中が、大きな軌道をつくります。</p>
+            </div>
+            <div class="heading-actions">
+              <button type="button" class="command-trigger" id="commandButton"><kbd>Ctrl</kbd><kbd>K</kbd><span>コマンド</span></button>
+              <button type="button" class="secondary-button" data-nav="planner">今日の予定</button>
+              <button type="button" class="primary-button" id="quickAddButton"><span>＋</span> ミッション追加</button>
+            </div>
+          </div>
+
+          <div class="dashboard-grid">
+            <article class="panel intention-panel">
+              <div class="panel-topline">
+                <div><span class="status-pip"></span><span class="panel-label">TODAY'S VECTOR</span></div>
+                <span class="live-clock" id="liveClock">00:00</span>
+              </div>
+              <div class="intention-content">
+                <p class="small-label">今日の航路</p>
+                <textarea id="intentionInput" maxlength="180" aria-label="今日の意図"></textarea>
+                <div class="energy-row">
+                  <span>ENERGY</span>
+                  <div class="energy-selector" id="energySelector" aria-label="エネルギーレベル">
+                    <button type="button" data-energy="1" aria-label="1"></button>
+                    <button type="button" data-energy="2" aria-label="2"></button>
+                    <button type="button" data-energy="3" aria-label="3"></button>
+                    <button type="button" data-energy="4" aria-label="4"></button>
+                    <button type="button" data-energy="5" aria-label="5"></button>
+                  </div>
+                  <span class="energy-copy" id="energyCopy">安定航行</span>
+                </div>
+              </div>
+              <div class="orbital-visual" aria-hidden="true">
+                <span class="orbit orbit-a"></span><span class="orbit orbit-b"></span><span class="planet"></span>
+              </div>
+            </article>
+
+            <article class="panel focus-widget">
+              <div class="panel-header">
+                <div><p class="panel-label">FOCUS CORE</p><h2>集中セッション</h2></div>
+                <button type="button" class="icon-button" data-nav="focus" aria-label="フォーカスを開く"><svg viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></svg></button>
+              </div>
+              <div class="compact-focus">
+                <div class="focus-ring small" id="dashboardRing"><div><strong id="dashboardTimer">25:00</strong><span>READY</span></div></div>
+                <div class="focus-widget-copy">
+                  <p id="dashboardFocusTask">ミッションを選択</p>
+                  <div class="focus-actions">
+                    <button type="button" class="round-action" id="dashboardFocusToggle"><svg viewBox="0 0 24 24"><path class="play-path" d="m9 7 8 5-8 5z"/></svg></button>
+                    <button type="button" class="text-button" data-nav="focus">詳細を開く</button>
+                  </div>
+                </div>
+              </div>
+            </article>
+
+            <article class="panel navigator-widget">
+              <div class="navigator-signal"><span></span><p class="panel-label">SMART NAVIGATOR</p></div>
+              <div class="navigator-copy"><strong id="navigatorTitle">次の一手を解析中</strong><p id="navigatorMessage">今日の状態から、無理のない行動を提案します。</p></div>
+              <div class="navigator-badges" id="navigatorBadges"></div>
+              <div class="navigator-actions"><button type="button" class="text-button" id="navigatorFocusButton">このミッションに集中</button><button type="button" class="icon-button" data-nav="planner" aria-label="予定を開く"><svg viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></svg></button></div>
+            </article>
+
+            <article class="panel mission-widget">
+              <div class="panel-header">
+                <div><p class="panel-label">MISSION CONTROL</p><h2>今日のミッション</h2></div>
+                <div class="mission-count"><strong id="openTaskCount">0</strong><span>OPEN</span></div>
+              </div>
+              <div class="task-list compact" id="dashboardTaskList"></div>
+              <button type="button" class="panel-footer-button" data-nav="missions">すべてのミッションを見る <span>→</span></button>
+            </article>
+
+            <article class="panel log-widget">
+              <div class="panel-header">
+                <div><p class="panel-label">CAPTAIN'S LOG</p><h2>思考を記録</h2></div>
+                <span class="save-state" id="noteSaveState"><i></i> SAVED</span>
+              </div>
+              <textarea id="dashboardNotes" placeholder="いま考えていることを書き留める…" aria-label="クイックノート"></textarea>
+              <div class="note-meta"><span id="noteCount">0文字</span><button type="button" class="text-button" data-nav="logbook">ログブックを開く</button></div>
+            </article>
+
+            <article class="panel progress-widget">
+              <div class="panel-header">
+                <div><p class="panel-label">WEEKLY ORBIT</p><h2>今週の軌道</h2></div>
+                <span class="trend-badge" id="weeklyTrend">+0%</span>
+              </div>
+              <canvas id="miniChart" height="120"></canvas>
+              <div class="progress-stats">
+                <div><strong id="weeklySessions">0</strong><span>SESSIONS</span></div>
+                <div><strong id="weeklyMinutes">0</strong><span>MINUTES</span></div>
+                <div><strong id="streakDays">0</strong><span>DAY STREAK</span></div>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section class="view" id="missionsView" data-view="missions">
+          <div class="page-heading">
+            <div><p class="eyebrow">MISSION CONTROL 4.0</p><h1>ミッション</h1><p class="subtitle">プロジェクトから次の一手まで、ひとつの軌道に。</p></div>
+            <div class="heading-actions"><button type="button" class="secondary-button" id="missionViewButton">ボード表示</button><button type="button" class="secondary-button" id="projectAddButton">＋ プロジェクト</button><button type="button" class="primary-button" id="missionAddButton"><span>＋</span> 新しいミッション</button></div>
+          </div>
+          <div class="project-strip" id="projectStrip"></div>
+          <div class="mission-toolbar panel">
+            <label class="search-field"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m16 16 4 4"/></svg><input id="taskSearch" type="search" placeholder="ミッションを検索"></label>
+            <div class="filter-chips" id="taskFilters">
+              <button type="button" class="active" data-filter="open">進行中</button>
+              <button type="button" data-filter="today">今日</button>
+              <button type="button" data-filter="all">すべて</button>
+              <button type="button" data-filter="done">完了</button>
+            </div>
+            <select id="projectFilterSelect" aria-label="プロジェクトで絞り込む"><option value="all">すべてのプロジェクト</option></select>
+            <select id="taskSort" aria-label="並び順"><option value="priority">優先度順</option><option value="due">期限順</option><option value="created">新しい順</option></select>
+          </div>
+          <div class="mission-summary" id="missionSummary"></div>
+          <div class="task-list full" id="missionTaskList"></div>
+          <div class="mission-board" id="missionBoard" aria-label="ミッションボード"></div>
+        </section>
+
+        <section class="view" id="plannerView" data-view="planner">
+          <div class="page-heading">
+            <div><p class="eyebrow">DAILY ORBIT</p><h1>デイリープラン</h1><p class="subtitle">時間と習慣に、無理のない軌道を与える。</p></div>
+            <div class="heading-actions"><div class="view-switch" id="plannerModeSwitch"><button type="button" class="active" data-planner-mode="day">日</button><button type="button" data-planner-mode="week">週</button><button type="button" data-planner-mode="month">月</button></div><button type="button" class="secondary-button" id="plannerTodayButton">今日に戻る</button><button type="button" class="primary-button" id="planAddButton"><span>＋</span> 予定を追加</button></div>
+          </div>
+          <div class="planner-datebar panel">
+            <button type="button" id="plannerPrev" aria-label="前の日">←</button>
+            <div><p id="plannerWeekday">FRIDAY</p><strong id="plannerDateLabel">2026年9月4日</strong></div>
+            <button type="button" id="plannerNext" aria-label="次の日">→</button>
+            <input type="date" id="plannerDateInput" aria-label="表示する日付">
+            <div class="planner-progress"><span>DAY COMPLETION</span><div><i id="plannerProgressBar"></i></div><strong id="plannerProgressText">0%</strong></div>
+          </div>
+          <div class="planner-assist panel" id="plannerAssist">
+            <div class="planner-assist-signal"><i></i><div><p>ORBIT ASSIST</p><strong id="plannerAssistTitle">今日の時間に余白があります</strong><span id="plannerAssistCopy">所要時間をもとに、優先ミッションを空き枠へ配置できます。</span></div></div>
+            <div class="planner-assist-metrics" id="plannerAssistMetrics"></div>
+            <button type="button" class="secondary-button" id="autoPlanButton">✦ 空き時間へ自動配置</button>
+          </div>
+          <article class="panel month-panel" id="monthPanel">
+            <div class="month-weekdays"><span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span>土</span><span>日</span></div>
+            <div class="month-grid" id="monthGrid"></div>
+          </article>
+          <article class="panel week-panel" id="weekPanel"><div class="week-grid" id="weekGrid"></div></article>
+          <div class="planner-layout">
+            <article class="panel day-plan-panel">
+              <div class="panel-header"><div><p class="panel-label">TIME BLOCKS</p><h2>今日の航行予定</h2></div><span id="planItemCount">0 BLOCKS</span></div>
+              <div class="day-plan-list" id="dayPlanList"></div>
+              <button type="button" class="plan-inline-add" id="planInlineAdd">＋ 時間ブロックを追加</button>
+            </article>
+            <aside class="planner-side">
+              <article class="panel ritual-panel">
+                <div class="panel-header"><div><p class="panel-label">DAILY RITUALS</p><h2>習慣トラッカー</h2></div><button type="button" class="icon-button" id="habitAddButton" aria-label="習慣を追加">＋</button></div>
+                <div class="habit-week-labels"><span></span><span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span>土</span><span>日</span></div>
+                <div class="habit-list" id="habitList"></div>
+              </article>
+              <article class="panel day-summary-panel">
+                <p class="panel-label">ORBIT SUMMARY</p>
+                <div class="day-summary-ring" id="daySummaryRing"><strong id="daySummaryValue">0%</strong><span>COMPLETE</span></div>
+                <p id="daySummaryCopy">最初の一歩を記録しましょう。</p>
+              </article>
+            </aside>
+          </div>
+        </section>
+
+        <section class="view" id="focusView" data-view="focus">
+          <div class="page-heading">
+            <div><p class="eyebrow">DEEP WORK PROTOCOL</p><h1>フォーカス</h1><p class="subtitle">時間を閉じ、ひとつのことだけを開く。</p></div>
+            <button type="button" class="secondary-button" id="focusMiniButton">⊡ ミニモード</button>
+          </div>
+          <div class="focus-layout">
+            <article class="panel focus-stage">
+              <div class="mode-selector" id="modeSelector">
+                <button type="button" class="active" data-minutes="25" data-break="5">FLOW 25</button>
+                <button type="button" data-minutes="50" data-break="10">DEEP 50</button>
+                <button type="button" data-minutes="90" data-break="20">IMMERSION 90</button>
+                <button type="button" data-minutes="custom" data-break="10">CUSTOM</button>
+              </div>
+              <div class="focus-orbit-wrap">
+                <div class="focus-orbit one"></div><div class="focus-orbit two"></div>
+                <div class="focus-ring large" id="focusRing">
+                  <div class="timer-center">
+                    <span id="focusPhase">FOCUS</span>
+                    <strong id="focusTimer">25:00</strong>
+                    <small id="focusStatus">準備完了</small>
+                  </div>
+                </div>
+              </div>
+              <select id="focusTaskSelect" class="focus-task-select" aria-label="集中するミッション"><option value="">ミッションを選択（任意）</option></select>
+              <div class="focus-control-row">
+                <button type="button" class="ghost-circle" id="focusResetButton" aria-label="リセット"><svg viewBox="0 0 24 24"><path d="M4 4v6h6M5.5 15a7 7 0 1 0 .4-7.5L4 10"/></svg></button>
+                <button type="button" class="focus-main-button" id="focusToggleButton"><svg viewBox="0 0 24 24"><path d="m9 7 8 5-8 5z"/></svg><span>START</span></button>
+                <button type="button" class="ghost-circle" id="focusSkipButton" aria-label="次へ"><svg viewBox="0 0 24 24"><path d="m6 7 7 5-7 5zM15 7v10"/></svg></button>
+              </div>
+            </article>
+
+            <aside class="focus-side">
+              <article class="panel sound-panel">
+                <div class="panel-header"><div><p class="panel-label">SOUNDSCAPE</p><h2>環境音</h2></div><button type="button" id="soundToggle" class="sound-power"><span></span> OFF</button></div>
+                <div class="sound-options" id="soundOptions">
+                  <button type="button" class="active" data-sound="cosmos"><span class="sound-icon">◌</span><span>Deep Space<small>深い宇宙</small></span></button>
+                  <button type="button" data-sound="rain"><span class="sound-icon">╱</span><span>Soft Rain<small>静かな雨</small></span></button>
+                  <button type="button" data-sound="cafe"><span class="sound-icon">⌁</span><span>Night Café<small>夜のカフェ</small></span></button>
+                </div>
+                <label class="volume-row"><span>VOLUME</span><input id="volumeSlider" type="range" min="0" max="100" value="32"><output id="volumeOutput">32%</output></label>
+              </article>
+              <article class="panel session-panel">
+                <div class="panel-header"><div><p class="panel-label">FLIGHT LOG</p><h2>今日のセッション</h2></div><strong id="todayFocusMinutes">0m</strong></div>
+                <div id="sessionTimeline" class="session-timeline"></div>
+              </article>
+            </aside>
+          </div>
+        </section>
+
+        <section class="view" id="logbookView" data-view="logbook">
+          <div class="page-heading">
+            <div><p class="eyebrow">CAPTAIN'S LOG</p><h1>ログブック</h1><p class="subtitle">考えを言葉にすると、進む方向が見えてくる。</p></div>
+            <div class="note-indicator"><span></span><b id="fullNoteSaveState">すべて保存済み</b></div>
+          </div>
+          <div class="logbook-shell panel">
+            <div class="log-toolbar">
+              <span>PLAIN MARKDOWN</span>
+              <div><button type="button" data-insert="**|**"><b>B</b></button><button type="button" data-insert="## |">H</button><button type="button" data-insert="- |">≡</button><button type="button" data-insert="- [ ] |">☐</button></div>
+              <span id="fullNoteStats">0文字 · 0行</span>
+            </div>
+            <div class="logbook-columns">
+              <textarea id="fullNotes" spellcheck="true" placeholder="# 今日のログ"></textarea>
+              <article id="notePreview" class="note-preview"></article>
+            </div>
+          </div>
+        </section>
+
+        <section class="view" id="insightsView" data-view="insights">
+          <div class="page-heading">
+            <div><p class="eyebrow">NAVIGATION DATA</p><h1>インサイト</h1><p class="subtitle">記録は評価ではなく、よりよく進むための地図。</p></div>
+            <button type="button" class="secondary-button" id="exportFromInsights">データを書き出す</button>
+          </div>
+          <div class="insights-kpis" id="insightKpis"></div>
+          <div class="insights-grid">
+            <article class="panel insight-chart-panel"><div class="panel-header"><div><p class="panel-label">FOCUS TELEMETRY</p><h2>過去7日間の集中時間</h2></div><span>MINUTES</span></div><canvas id="insightsChart" height="270"></canvas></article>
+            <article class="panel distribution-panel"><div class="panel-header"><div><p class="panel-label">MISSION SIGNAL</p><h2>ミッション分布</h2></div></div><div id="distributionChart" class="distribution-chart"></div></article>
+            <article class="panel heatmap-panel"><div class="panel-header"><div><p class="panel-label">CONSISTENCY MAP</p><h2>過去5週間</h2></div><span>LESS ◼ ◼ ◼ MORE</span></div><div class="heatmap" id="activityHeatmap"></div></article>
+          </div>
+        </section>
+
+        <section class="view" id="nexusView" data-view="nexus">
+          <div class="page-heading">
+            <div><p class="eyebrow">NEXUS 4.0</p><h1>ワークスペース知能</h1><p class="subtitle">自動化、テンプレート、診断を、すべて端末内で安全に。</p></div>
+            <div class="heading-actions"><button type="button" class="secondary-button" id="nexusScanButton">◇ 健全性スキャン</button><button type="button" class="primary-button" id="nexusRunButton">✦ 自動化を実行</button></div>
+          </div>
+          <article class="panel nexus-hero">
+            <div class="nexus-symbol" aria-hidden="true"><span>✦</span><i></i><i></i></div>
+            <div class="nexus-hero-copy"><p class="panel-label">LOCAL INTELLIGENCE CORE</p><h2>あなたの軌道を、静かに整える。</h2><p>クラウド送信もスクリプト実行もせず、許可したルールだけをローカルデータへ適用します。</p></div>
+            <div class="nexus-pulse"><strong id="nexusHealthScore">100</strong><span>HEALTH</span></div>
+            <div class="nexus-live-stats"><span><b id="nexusEnabledCount">0</b> ACTIVE RULES</span><span><b id="nexusTemplateCount">4</b> TEMPLATES</span><span><b id="nexusRunCount">0</b> RUNS</span></div>
+          </article>
+          <div class="nexus-tabs" id="nexusTabs" role="tablist" aria-label="NEXUS機能">
+            <button type="button" class="active" id="nexusAutomationTab" role="tab" aria-selected="true" aria-controls="nexusAutomationPanel" data-nexus-tab="automations">✦ 自動化</button>
+            <button type="button" id="nexusTemplateTab" role="tab" aria-selected="false" aria-controls="nexusTemplatePanel" data-nexus-tab="templates">▦ テンプレート</button>
+            <button type="button" id="nexusHealthTab" role="tab" aria-selected="false" aria-controls="nexusHealthPanel" data-nexus-tab="health">◇ データ診断</button>
+          </div>
+          <section class="nexus-section active" id="nexusAutomationPanel" role="tabpanel" aria-labelledby="nexusAutomationTab" data-nexus-panel="automations">
+            <div class="nexus-section-heading"><div><p class="panel-label">AUTOMATION DECK</p><h2>ローカル自動化</h2><p>条件と処理が一致したミッションだけを更新します。</p></div><button type="button" class="secondary-button" id="addAutomationButton">＋ ルール作成</button></div>
+            <div class="automation-grid" id="automationList"></div>
+            <article class="panel automation-history-panel"><div class="panel-header"><div><p class="panel-label">RUN HISTORY</p><h2>実行履歴</h2></div><button type="button" class="text-button" id="clearAutomationHistory">履歴を消去</button></div><div id="automationHistory" class="automation-history"></div></article>
+          </section>
+          <section class="nexus-section" id="nexusTemplatePanel" role="tabpanel" aria-labelledby="nexusTemplateTab" data-nexus-panel="templates">
+            <div class="nexus-section-heading"><div><p class="panel-label">MISSION BLUEPRINTS</p><h2>再利用テンプレート</h2><p>プロジェクト、ミッション、時間ブロックをまとめて展開します。</p></div><button type="button" class="secondary-button" id="addTemplateButton">＋ テンプレート作成</button></div>
+            <div class="template-grid" id="templateGrid"></div>
+          </section>
+          <section class="nexus-section" id="nexusHealthPanel" role="tabpanel" aria-labelledby="nexusHealthTab" data-nexus-panel="health">
+            <div class="health-layout">
+              <article class="panel health-score-card"><div class="health-ring" id="healthRing"><strong id="healthScore">100</strong><span>WORKSPACE<br>HEALTH</span></div><div><p class="panel-label">INTEGRITY SIGNAL</p><h2 id="healthSummary">スキャン待機中</h2><p id="healthScanTime">「健全性スキャン」でデータを検査します。</p></div><button type="button" class="primary-button" id="healthScanButton">今すぐスキャン</button></article>
+              <div class="diagnostic-list" id="diagnosticList"></div>
+            </div>
+          </section>
+        </section>
+
+        <section class="view" id="integrationsView" data-view="integrations">
+          <div class="page-heading">
+            <div><p class="eyebrow">BRIDGE 4.0</p><h1>サービス連携</h1><p class="subtitle">認証情報を保存せず、標準ファイルでデータを安全に行き来させます。</p></div>
+            <div class="heading-actions"><button type="button" class="secondary-button" id="integrationImportButton">⇩ インポート</button><button type="button" class="primary-button" id="integrationExportButton">⇧ エクスポート</button></div>
+          </div>
+          <div class="integration-summary">
+            <article class="panel connection-hero">
+              <div class="connection-orbit" aria-hidden="true"><i></i><i></i><i></i><span>↔</span></div>
+              <div><p class="panel-label">LOCAL DATA BRIDGE</p><h2>あなたのデータは、あなたの手元から。</h2><p>Google Calendar、Outlook、Todoist、Notion、Trello、Excelへ、ICS・CSV・JSON・Markdownで接続します。</p></div>
+              <div class="connection-metrics"><span><b>6</b> SERVICES</span><span><b>6</b> FORMATS</span><span><b id="transferCount">0</b> TRANSFERS</span></div>
+            </article>
+          </div>
+          <div class="service-grid" id="integrationServices">
+            <article class="service-card panel" data-service="Google Calendar"><div class="service-icon google">G</div><div class="service-copy"><p class="panel-label">CALENDAR</p><h2>Google Calendar</h2><p>予定をICS / Google形式CSVで受け渡します。</p><span>ICS · CSV</span></div><div class="service-actions"><button type="button" class="secondary-button" data-exchange-mode="import" data-service="Google Calendar">読み込む</button><button type="button" class="text-button" data-exchange-mode="export" data-service="Google Calendar" data-format="calendarIcs">書き出す</button></div></article>
+            <article class="service-card panel" data-service="Outlook Calendar"><div class="service-icon outlook">O</div><div class="service-copy"><p class="panel-label">CALENDAR</p><h2>Outlook Calendar</h2><p>標準iCalendarファイルで予定を交換します。</p><span>ICS</span></div><div class="service-actions"><button type="button" class="secondary-button" data-exchange-mode="import" data-service="Outlook Calendar">読み込む</button><button type="button" class="text-button" data-exchange-mode="export" data-service="Outlook Calendar" data-format="calendarIcs">書き出す</button></div></article>
+            <article class="service-card panel" data-service="Todoist"><div class="service-icon todoist">T</div><div class="service-copy"><p class="panel-label">TASKS</p><h2>Todoist</h2><p>優先度、期限、所要時間を公式CSV列へ変換します。</p><span>TODOIST CSV</span></div><div class="service-actions"><button type="button" class="secondary-button" data-exchange-mode="import" data-service="Todoist">読み込む</button><button type="button" class="text-button" data-exchange-mode="export" data-service="Todoist" data-format="todoistCsv">書き出す</button></div></article>
+            <article class="service-card panel" data-service="Notion"><div class="service-icon notion">N</div><div class="service-copy"><p class="panel-label">KNOWLEDGE</p><h2>Notion</h2><p>データベースはCSV、ログブックはMarkdownで共有できます。</p><span>CSV · MARKDOWN</span></div><div class="service-actions"><button type="button" class="secondary-button" data-exchange-mode="import" data-service="Notion">読み込む</button><button type="button" class="text-button" data-exchange-mode="export" data-service="Notion" data-format="tasksCsv">書き出す</button></div></article>
+            <article class="service-card panel" data-service="Trello"><div class="service-icon trello">Tr</div><div class="service-copy"><p class="panel-label">BOARDS</p><h2>Trello</h2><p>ボードのJSON / CSVからカードとチェックリストを取り込みます。</p><span>JSON · CSV</span></div><div class="service-actions"><button type="button" class="secondary-button" data-exchange-mode="import" data-service="Trello">読み込む</button><button type="button" class="text-button" data-exchange-mode="export" data-service="Trello" data-format="tasksCsv">CSV出力</button></div></article>
+            <article class="service-card panel" data-service="Excel / CSV"><div class="service-icon excel">X</div><div class="service-copy"><p class="panel-label">SPREADSHEET</p><h2>Excel / CSV</h2><p>UTF-8 CSVでミッションを表計算ソフトと交換します。</p><span>CSV UTF-8</span></div><div class="service-actions"><button type="button" class="secondary-button" data-exchange-mode="import" data-service="Excel / CSV">読み込む</button><button type="button" class="text-button" data-exchange-mode="export" data-service="Excel / CSV" data-format="tasksCsv">書き出す</button></div></article>
+          </div>
+          <article class="panel transfer-panel">
+            <div class="panel-header"><div><p class="panel-label">TRANSFER HISTORY</p><h2>最近のデータ交換</h2></div><button type="button" class="text-button" id="clearTransferHistory">履歴を消去</button></div>
+            <div class="transfer-history" id="transferHistory"></div>
+          </article>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <div class="mini-focus" id="miniFocus" aria-hidden="true">
+    <div class="mini-drag"><span class="signal-dot"></span> ASTERIA FOCUS</div>
+    <button type="button" id="exitMiniButton" aria-label="ミニモードを終了">×</button>
+    <strong id="miniTimer">25:00</strong>
+    <p id="miniTask">ミッション未選択</p>
+    <button type="button" id="miniToggle">START</button>
+  </div>
+
+  <div class="modal-backdrop" id="taskModal" aria-hidden="true">
+    <form class="modal" id="taskForm" role="dialog" aria-modal="true" aria-labelledby="taskModalTitle">
+      <div class="modal-head"><div><p class="panel-label">NEW VECTOR</p><h2 id="taskModalTitle">ミッションを追加</h2></div><button type="button" class="modal-close" data-close-modal>×</button></div>
+      <input type="hidden" id="taskId">
+      <label class="field"><span>ミッション名</span><input id="taskTitle" maxlength="100" required autofocus placeholder="例：企画書の最初の1ページを書く"></label>
+      <label class="field"><span>メモ</span><textarea id="taskDetail" maxlength="500" rows="3" placeholder="完了条件や、次の一手を書いておく"></textarea></label>
+      <div class="field-grid task-fields">
+        <label class="field"><span>優先度</span><select id="taskPriority"><option value="high">HIGH — 最優先</option><option value="medium" selected>MEDIUM — 通常</option><option value="low">LOW — 余裕があれば</option></select></label>
+        <label class="field"><span>カテゴリー</span><select id="taskCategory"><option value="WORK">WORK</option><option value="PERSONAL">PERSONAL</option><option value="GROWTH">GROWTH</option><option value="FOCUS">FOCUS</option></select></label>
+        <label class="field"><span>期限</span><input id="taskDue" type="date"></label>
+        <label class="field"><span>繰り返し</span><select id="taskRecurrence"><option value="none">繰り返さない</option><option value="daily">毎日</option><option value="weekdays">平日のみ</option><option value="weekly">毎週</option></select></label>
+        <label class="field"><span>推定所要時間</span><select id="taskEstimate"><option value="15">15分</option><option value="25" selected>25分</option><option value="30">30分</option><option value="45">45分</option><option value="60">1時間</option><option value="90">1時間30分</option><option value="120">2時間</option></select></label>
+        <label class="field"><span>プロジェクト</span><select id="taskProject"><option value="">プロジェクトなし</option></select></label>
+        <label class="field"><span>状態</span><select id="taskStatus"><option value="backlog">BACKLOG — あとで</option><option value="next" selected>NEXT — 次に行う</option><option value="waiting">WAITING — 待機中</option><option value="done">COMPLETE — 完了</option></select></label>
+      </div>
+      <div class="field subtask-editor"><span>サブタスク</span><div class="subtask-entry"><input id="subtaskInput" maxlength="120" placeholder="小さな完了条件を追加"><button type="button" id="subtaskAddButton">追加</button></div><div class="subtask-draft-list" id="subtaskDraftList"></div></div>
+      <div class="modal-actions"><button type="button" class="secondary-button" data-close-modal>キャンセル</button><button type="submit" class="primary-button">ミッションを保存</button></div>
+    </form>
+  </div>
+
+  <div class="modal-backdrop" id="projectModal" aria-hidden="true">
+    <form class="modal compact-modal" id="projectForm" role="dialog" aria-modal="true" aria-labelledby="projectModalTitle">
+      <div class="modal-head"><div><p class="panel-label">PROJECT ORBIT</p><h2 id="projectModalTitle">プロジェクトを追加</h2></div><button type="button" class="modal-close" data-close-project>×</button></div>
+      <input type="hidden" id="projectId">
+      <label class="field"><span>プロジェクト名</span><input id="projectName" maxlength="80" required placeholder="例：新製品ローンチ"></label>
+      <label class="field"><span>目的・説明</span><textarea id="projectDescription" maxlength="240" rows="3" placeholder="このプロジェクトで実現したいこと"></textarea></label>
+      <label class="field"><span>シグナルカラー</span><select id="projectColor"><option value="violet">NEBULA</option><option value="cyan">AURORA</option><option value="amber">SOLAR</option><option value="green">LIFE</option></select></label>
+      <div class="modal-actions"><button type="button" class="secondary-button danger-button" id="projectDeleteButton">削除</button><span class="modal-spacer"></span><button type="button" class="secondary-button" data-close-project>キャンセル</button><button type="submit" class="primary-button">プロジェクトを保存</button></div>
+    </form>
+  </div>
+
+  <div class="modal-backdrop" id="planModal" aria-hidden="true">
+    <form class="modal compact-modal" id="planForm" role="dialog" aria-modal="true" aria-labelledby="planModalTitle">
+      <div class="modal-head"><div><p class="panel-label">NEW TIME BLOCK</p><h2 id="planModalTitle">予定を追加</h2></div><button type="button" class="modal-close" data-close-plan>×</button></div>
+      <input type="hidden" id="planId">
+      <label class="field"><span>予定の名前</span><input id="planTitle" maxlength="100" required placeholder="例：企画書に集中する"></label>
+      <div class="field-grid plan-fields">
+        <label class="field"><span>日付</span><input id="planDate" type="date" required></label>
+        <label class="field"><span>開始時刻</span><input id="planTime" type="time" required></label>
+        <label class="field"><span>長さ</span><select id="planDuration"><option value="15">15分</option><option value="30" selected>30分</option><option value="45">45分</option><option value="60">1時間</option><option value="90">1時間30分</option><option value="120">2時間</option></select></label>
+        <label class="field"><span>通知</span><select id="planReminder"><option value="-1">通知なし</option><option value="0">開始時刻</option><option value="5">5分前</option><option value="10">10分前</option><option value="15">15分前</option><option value="30">30分前</option></select></label>
+      </div>
+      <label class="field"><span>関連ミッション（任意）</span><select id="planTask"><option value="">関連付けない</option></select></label>
+      <div class="modal-actions"><button type="button" class="secondary-button" data-close-plan>キャンセル</button><button type="submit" class="primary-button">予定を保存</button></div>
+    </form>
+  </div>
+
+  <div class="modal-backdrop" id="habitModal" aria-hidden="true">
+    <form class="modal compact-modal" id="habitForm" role="dialog" aria-modal="true" aria-labelledby="habitModalTitle">
+      <div class="modal-head"><div><p class="panel-label">NEW RITUAL</p><h2 id="habitModalTitle">習慣を追加</h2></div><button type="button" class="modal-close" data-close-habit>×</button></div>
+      <input type="hidden" id="habitId">
+      <label class="field"><span>習慣の名前</span><input id="habitName" maxlength="80" required placeholder="例：本を10ページ読む"></label>
+      <div class="field-grid habit-fields">
+        <label class="field"><span>週間目標</span><select id="habitTarget"><option value="3">週3日</option><option value="5" selected>週5日</option><option value="7">毎日</option></select></label>
+        <label class="field"><span>シグナルカラー</span><select id="habitColor"><option value="violet">NEBULA</option><option value="cyan">AURORA</option><option value="amber">SOLAR</option><option value="green">LIFE</option></select></label>
+      </div>
+      <div class="modal-actions"><button type="button" class="secondary-button" data-close-habit>キャンセル</button><button type="submit" class="primary-button">習慣を保存</button></div>
+    </form>
+  </div>
+
+  <div class="modal-backdrop" id="settingsModal" aria-hidden="true">
+    <form class="modal settings-modal" id="settingsForm" role="dialog" aria-modal="true" aria-labelledby="settingsModalTitle">
+      <div class="modal-head"><div><p class="panel-label">SYSTEM CONFIG</p><h2 id="settingsModalTitle">設定</h2></div><button type="button" class="modal-close" data-close-settings>×</button></div>
+      <label class="field"><span>表示名</span><input id="settingName" maxlength="40"></label>
+      <label class="field"><span>週間セッション目標</span><input id="settingGoal" type="number" min="1" max="50"></label>
+      <label class="field"><span>カスタム集中時間（分）</span><input id="settingCustomFocus" type="number" min="5" max="180"></label>
+      <div class="field"><span>外観モード</span><div class="appearance-options" id="appearanceOptions"><button type="button" data-appearance="light">☀ ライト</button><button type="button" data-appearance="dark" class="active">◐ ダーク</button><button type="button" data-appearance="system">◉ システム</button></div></div>
+      <div class="field"><span>カラーテーマ</span><div class="theme-options" id="themeOptions"><button type="button" data-theme-option="violet" class="active"><i class="violet"></i>NEBULA</button><button type="button" data-theme-option="cyan"><i class="cyan"></i>AURORA</button><button type="button" data-theme-option="amber"><i class="amber"></i>SOLAR</button></div></div>
+      <label class="field color-field"><span>カスタムアクセント</span><div><input id="settingAccentColor" type="color" value="#8f7cf7"><output id="accentColorValue">#8F7CF7</output><button type="button" class="text-button" id="resetAccentColor">標準色へ戻す</button></div></label>
+      <label class="field"><span>モーション</span><select id="settingMotionIntensity"><option value="expressive">EXPRESSIVE — 奥行きのある動き</option><option value="gentle">GENTLE — 控えめな動き</option></select></label>
+      <label class="toggle-field"><span><b>Windows通知</b><small>集中セッション完了と予定リマインダーを通知</small></span><input id="settingNotifications" type="checkbox"><i></i></label>
+      <label class="toggle-field"><span><b>アニメーションを減らす</b><small>動きを抑え、集中しやすい表示にします</small></span><input id="settingReducedMotion" type="checkbox"><i></i></label>
+      <label class="toggle-field"><span><b>閉じたときタスクトレイに残す</b><small>タイマーと予定通知をバックグラウンドで継続</small></span><input id="settingCloseToTray" type="checkbox"><i></i></label>
+      <div class="data-actions"><button type="button" class="secondary-button" id="exportButton">バックアップを書き出す</button><button type="button" class="secondary-button" id="importButton">バックアップを読み込む</button></div>
+      <div class="modal-actions"><button type="button" class="secondary-button" data-close-settings>閉じる</button><button type="submit" class="primary-button">設定を保存</button></div>
+    </form>
+  </div>
+
+  <div class="modal-backdrop" id="exchangeModal" aria-hidden="true">
+    <form class="modal compact-modal exchange-modal" id="exchangeForm" role="dialog" aria-modal="true" aria-labelledby="exchangeModalTitle">
+      <div class="modal-head"><div><p class="panel-label">DATA PORT</p><h2 id="exchangeModalTitle">データを書き出す</h2></div><button type="button" class="modal-close" data-close-exchange>×</button></div>
+      <input type="hidden" id="exchangeMode" value="export">
+      <input type="hidden" id="exchangeService" value="ASTERIA">
+      <div class="exchange-service-badge"><span id="exchangeServiceIcon">↔</span><div><b id="exchangeServiceName">ASTERIA</b><small id="exchangeServiceCopy">安全なローカルファイル交換</small></div></div>
+      <label class="field" id="exchangeFormatField"><span>ファイル形式</span><select id="exchangeFormat"><option value="backup">ASTERIA完全バックアップ（JSON）</option><option value="tasksCsv">汎用タスク（CSV）</option><option value="todoistCsv">Todoistプロジェクト（CSV）</option><option value="calendarIcs">カレンダー（ICS）</option><option value="calendarCsv">Google Calendar（CSV）</option><option value="notesMarkdown">ログブック（Markdown）</option></select></label>
+      <div class="exchange-notice" id="exchangeNotice"><b>ローカル処理</b><span>データは外部サーバーを経由しません。</span></div>
+      <div class="modal-actions"><button type="button" class="secondary-button" data-close-exchange>キャンセル</button><button type="submit" class="primary-button" id="exchangeSubmitButton">書き出す</button></div>
+    </form>
+  </div>
+
+  <div class="modal-backdrop" id="automationModal" aria-hidden="true">
+    <form class="modal compact-modal" id="automationForm" role="dialog" aria-modal="true" aria-labelledby="automationModalTitle">
+      <div class="modal-head"><div><p class="panel-label">NEW LOCAL RULE</p><h2 id="automationModalTitle">自動化ルールを作成</h2></div><button type="button" class="modal-close" data-close-automation>×</button></div>
+      <label class="field"><span>ルール名</span><input id="automationName" maxlength="80" required placeholder="例：未分類を今日の予定へ"></label>
+      <label class="field"><span>条件</span><select id="automationCondition"><option value="overdue_open">期限を過ぎた未完了</option><option value="due_today_open">今日が期限の未完了</option><option value="no_due_open">期限がない未完了</option><option value="high_priority_open">HIGHの未完了</option><option value="waiting_stale">14日以上WAITING</option><option value="completed_today">今日完了した項目</option></select></label>
+      <label class="field"><span>実行する処理</span><select id="automationAction"><option value="priority_high">優先度をHIGHにする</option><option value="move_next">NEXTへ移動する</option><option value="set_due_today">期限を今日にする</option><option value="assign_inbox">Automation Inboxへ整理する</option><option value="schedule_today">今日の空き時間へ配置する</option><option value="append_log">ログブックへ記録する</option></select></label>
+      <div class="local-only-notice"><span>⌁</span><div><b>予測可能なローカル処理</b><small>自由なスクリプトは実行せず、上記の条件と処理だけを適用します。</small></div></div>
+      <div class="modal-actions"><button type="button" class="secondary-button" data-close-automation>キャンセル</button><button type="submit" class="primary-button">ルールを保存</button></div>
+    </form>
+  </div>
+
+  <div class="modal-backdrop" id="templateModal" aria-hidden="true">
+    <form class="modal compact-modal" id="templateForm" role="dialog" aria-modal="true" aria-labelledby="templateModalTitle">
+      <div class="modal-head"><div><p class="panel-label">NEW BLUEPRINT</p><h2 id="templateModalTitle">テンプレートを作成</h2></div><button type="button" class="modal-close" data-close-template>×</button></div>
+      <label class="field"><span>テンプレート名</span><input id="templateName" maxlength="80" required placeholder="例：月次レポート"></label>
+      <label class="field"><span>説明</span><textarea id="templateDescription" maxlength="240" rows="2" placeholder="このテンプレートの目的"></textarea></label>
+      <label class="field"><span>シグナルカラー</span><select id="templateColor"><option value="violet">NEBULA</option><option value="cyan">AURORA</option><option value="amber">SOLAR</option><option value="green">LIFE</option></select></label>
+      <label class="field"><span>ミッション（1行につき1件）</span><textarea id="templateTasks" maxlength="3000" rows="6" required placeholder="情報を集める&#10;初稿を作る&#10;レビューして提出する"></textarea></label>
+      <div class="modal-actions"><button type="button" class="secondary-button" data-close-template>キャンセル</button><button type="submit" class="primary-button">テンプレートを保存</button></div>
+    </form>
+  </div>
+
+  <div class="command-palette" id="commandPalette" aria-hidden="true">
+    <div class="command-box" role="dialog" aria-modal="true" aria-label="コマンドとワークスペース検索">
+      <label><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m16 16 4 4"/></svg><input id="commandSearch" placeholder="コマンドまたはミッションを検索…"><kbd>ESC</kbd></label>
+      <div class="command-results" id="commandResults"></div>
+      <footer><span>↑↓ 選択</span><span>↵ 実行</span><span>ASTERIA COMMAND</span></footer>
+    </div>
+  </div>
+
+  <div class="toast-region" id="toastRegion" aria-live="polite"></div>
+  <script src="../productivity-engine.js"></script>
+  <script src="planning.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
