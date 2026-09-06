@@ -212,7 +212,7 @@ function toIcs(state) {
       'END:VEVENT'
     ].join('\r\n'));
   }
-  return ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//ASTERIA Studio//ASTERIA 4.0//JA', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH', ...events, 'END:VCALENDAR', ''].join('\r\n');
+  return ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//ASTERIA Studio//ASTERIA 4.5//EN', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH', ...events, 'END:VCALENDAR', ''].join('\r\n');
 }
 
 function readIcsField(block, name) {

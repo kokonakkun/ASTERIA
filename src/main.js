@@ -9,6 +9,42 @@ let store;
 let tray;
 let closeToTray = false;
 let isQuitting = false;
+let appLocale = 'ja';
+
+const nativeLocaleColumns = ['ja', 'en', 'zh-CN', 'zh-TW', 'ko', 'es', 'fr', 'de', 'pt-BR', 'hi', 'ar'];
+const nativeLocaleRows = [
+  ['ASTERIAを開く', 'Open ASTERIA', '打开 ASTERIA', '開啟 ASTERIA', 'ASTERIA 열기', 'Abrir ASTERIA', 'Ouvrir ASTERIA', 'ASTERIA öffnen', 'Abrir ASTERIA', 'ASTERIA खोलें', 'فتح ASTERIA'],
+  ['フォーカスを開く', 'Open Focus', '打开专注', '開啟專注', '집중 열기', 'Abrir concentración', 'Ouvrir Concentration', 'Fokus öffnen', 'Abrir foco', 'फ़ोकस खोलें', 'فتح التركيز'],
+  ['今日の予定を開く', "Open today's plan", '打开今日计划', '開啟今日計畫', '오늘 계획 열기', 'Abrir el plan de hoy', 'Ouvrir le plan du jour', 'Heutigen Plan öffnen', 'Abrir plano de hoje', 'आज की योजना खोलें', 'فتح خطة اليوم'],
+  ['終了', 'Quit', '退出', '結束', '종료', 'Salir', 'Quitter', 'Beenden', 'Sair', 'बंद करें', 'إنهاء'],
+  ['ASTERIA バックアップを保存', 'Save ASTERIA backup', '保存 ASTERIA 备份', '儲存 ASTERIA 備份', 'ASTERIA 백업 저장', 'Guardar copia de ASTERIA', 'Enregistrer la sauvegarde ASTERIA', 'ASTERIA-Sicherung speichern', 'Salvar backup do ASTERIA', 'ASTERIA बैकअप सहेजें', 'حفظ نسخة ASTERIA الاحتياطية'],
+  ['ASTERIA バックアップを読み込む', 'Import ASTERIA backup', '导入 ASTERIA 备份', '匯入 ASTERIA 備份', 'ASTERIA 백업 가져오기', 'Importar copia de ASTERIA', 'Importer la sauvegarde ASTERIA', 'ASTERIA-Sicherung importieren', 'Importar backup do ASTERIA', 'ASTERIA बैकअप आयात करें', 'استيراد نسخة ASTERIA الاحتياطية'],
+  ['未対応の書き出し形式です。', 'This export format is not supported.', '不支持此导出格式。', '不支援此匯出格式。', '지원하지 않는 내보내기 형식입니다.', 'Este formato de exportación no es compatible.', "Ce format d’exportation n’est pas pris en charge.", 'Dieses Exportformat wird nicht unterstützt.', 'Este formato de exportação não é compatível.', 'यह निर्यात प्रारूप समर्थित नहीं है।', 'تنسيق التصدير هذا غير مدعوم.'],
+  ['安全のため20MBを超えるファイルは読み込めません。', 'Files larger than 20 MB cannot be imported for safety.', '为安全起见，无法导入超过 20 MB 的文件。', '基於安全考量，無法匯入超過 20 MB 的檔案。', '안전을 위해 20MB보다 큰 파일은 가져올 수 없습니다.', 'Por seguridad, no se pueden importar archivos de más de 20 MB.', 'Par sécurité, les fichiers de plus de 20 Mo ne peuvent pas être importés.', 'Dateien über 20 MB können aus Sicherheitsgründen nicht importiert werden.', 'Por segurança, arquivos acima de 20 MB não podem ser importados.', 'सुरक्षा के लिए 20 MB से बड़ी फ़ाइल आयात नहीं की जा सकती।', 'لأسباب أمنية، لا يمكن استيراد ملفات أكبر من 20 ميغابايت.']
+];
+const nativeDictionaries = Object.fromEntries(nativeLocaleColumns.map((locale) => [locale, new Map()]));
+nativeLocaleRows.forEach((row) => nativeLocaleColumns.forEach((locale, index) => nativeDictionaries[locale].set(row[0], row[index] || row[1])));
+
+function normalizeAppLocale(value) {
+  const source = String(value || '').toLowerCase();
+  if (source.startsWith('zh-tw') || source.startsWith('zh-hk') || source.startsWith('zh-hant')) return 'zh-TW';
+  if (source.startsWith('zh')) return 'zh-CN';
+  if (source.startsWith('pt')) return 'pt-BR';
+  return nativeLocaleColumns.find((locale) => locale.toLowerCase() === source || locale.toLowerCase() === source.split('-')[0]) || 'en';
+}
+
+function nativeT(source) {
+  if (appLocale === 'ja') return source;
+  return nativeDictionaries[appLocale]?.get(source) || nativeDictionaries.en.get(source) || source;
+}
+
+function setAppLocale(value) {
+  const nextLocale = value === 'system' ? normalizeAppLocale(app.getLocale()) : normalizeAppLocale(value);
+  if (nextLocale === appLocale) return appLocale;
+  appLocale = nextLocale;
+  if (tray) { destroyTray(); createTray(); }
+  return appLocale;
+}
 
 const gotLock = app.requestSingleInstanceLock();
 if (!gotLock) {
@@ -71,6 +107,10 @@ function createWindow() {
         const view = process.env.ASTERIA_SCREENSHOT_VIEW;
         const scheme = process.env.ASTERIA_SCREENSHOT_SCHEME;
         const accent = process.env.ASTERIA_SCREENSHOT_ACCENT;
+        const locale = process.env.ASTERIA_SCREENSHOT_LOCALE;
+        if (locale && ['system', ...nativeLocaleColumns].includes(locale)) {
+          await mainWindow.webContents.executeJavaScript(`(() => { const select = document.querySelector('#settingLocale'); if (select) { select.value = '${locale}'; select.dispatchEvent(new Event('change', { bubbles: true })); } })()`);
+        }
         if (scheme && ['light', 'dark', 'system'].includes(scheme)) {
           await mainWindow.webContents.executeJavaScript(`document.querySelector('[data-appearance="${scheme}"]')?.click()`);
         }
@@ -141,11 +181,11 @@ function createTray() {
   tray = new Tray(path.join(__dirname, '..', 'assets', 'icon.png'));
   tray.setToolTip('ASTERIA — Personal Command Center');
   tray.setContextMenu(Menu.buildFromTemplate([
-    { label: 'ASTERIAを開く', click: () => showWindow('dashboard') },
-    { label: 'フォーカスを開く', click: () => showWindow('focus') },
-    { label: '今日の予定を開く', click: () => showWindow('planner') },
+    { label: nativeT('ASTERIAを開く'), click: () => showWindow('dashboard') },
+    { label: nativeT('フォーカスを開く'), click: () => showWindow('focus') },
+    { label: nativeT('今日の予定を開く'), click: () => showWindow('planner') },
     { type: 'separator' },
-    { label: '終了', click: () => { isQuitting = true; app.quit(); } }
+    { label: nativeT('終了'), click: () => { isQuitting = true; app.quit(); } }
   ]));
   tray.on('double-click', () => showWindow());
 }
@@ -171,8 +211,15 @@ app.on('window-all-closed', () => {
 
 app.on('before-quit', () => { isQuitting = true; });
 
-ipcMain.handle('data:load', () => store.load());
-ipcMain.handle('data:save', (_event, value) => store.save(value));
+ipcMain.handle('data:load', () => {
+  const value = store.load();
+  setAppLocale(value.settings?.locale || 'system');
+  return value;
+});
+ipcMain.handle('data:save', (_event, value) => {
+  setAppLocale(value?.settings?.locale || 'system');
+  return store.save(value);
+});
 ipcMain.on('data:save-sync', (event, value) => {
   try {
     store.save(value);
@@ -184,7 +231,7 @@ ipcMain.on('data:save-sync', (event, value) => {
 
 ipcMain.handle('data:export', async (_event, value) => {
   const result = await dialog.showSaveDialog(mainWindow, {
-    title: 'ASTERIA バックアップを保存',
+    title: nativeT('ASTERIA バックアップを保存'),
     defaultPath: `ASTERIA-backup-${new Date().toISOString().slice(0, 10)}.json`,
     filters: [{ name: 'ASTERIA Backup', extensions: ['json'] }]
   });
@@ -195,7 +242,7 @@ ipcMain.handle('data:export', async (_event, value) => {
 
 ipcMain.handle('data:import', async () => {
   const result = await dialog.showOpenDialog(mainWindow, {
-    title: 'ASTERIA バックアップを読み込む',
+    title: nativeT('ASTERIA バックアップを読み込む'),
     properties: ['openFile'],
     filters: [{ name: 'ASTERIA Backup', extensions: ['json'] }]
   });
@@ -213,10 +260,10 @@ ipcMain.handle('data:import', async () => {
 ipcMain.handle('exchange:export', async (_event, { format, value, service = 'ASTERIA' } = {}) => {
   try {
     const descriptor = EXPORT_FORMATS[format];
-    if (!descriptor) return { canceled: false, error: '未対応の書き出し形式です。' };
+    if (!descriptor) return { canceled: false, error: nativeT('未対応の書き出し形式です。') };
     const payload = serializeExport(format, value);
     const result = await dialog.showSaveDialog(mainWindow, {
-      title: `${descriptor.label}を書き出す`,
+      title: appLocale === 'ja' ? `${descriptor.label}を書き出す` : `Export ${descriptor.label}`,
       defaultPath: payload.defaultName,
       filters: [{ name: descriptor.label, extensions: [descriptor.extension] }]
     });
@@ -238,7 +285,7 @@ ipcMain.handle('exchange:import', async (_event, { value, service = 'ASTERIA' } 
     'Excel / CSV': [{ name: 'CSV', extensions: ['csv'] }]
   };
   const result = await dialog.showOpenDialog(mainWindow, {
-    title: `${service}からデータを読み込む`,
+    title: appLocale === 'ja' ? `${service}からデータを読み込む` : `Import data from ${service}`,
     properties: ['openFile'],
     filters: serviceFilters[service] || [{ name: 'Supported data', extensions: ['json', 'csv', 'ics', 'md', 'markdown', 'txt'] }]
   });
@@ -246,7 +293,7 @@ ipcMain.handle('exchange:import', async (_event, { value, service = 'ASTERIA' } 
   try {
     const filePath = result.filePaths[0];
     const stats = fs.statSync(filePath);
-    if (stats.size > 20 * 1024 * 1024) throw new Error('安全のため20MBを超えるファイルは読み込めません。');
+    if (stats.size > 20 * 1024 * 1024) throw new Error(nativeT('安全のため20MBを超えるファイルは読み込めません。'));
     const imported = parseImport(filePath, fs.readFileSync(filePath, 'utf8'));
     const merged = mergeImport(value, imported);
     const count = merged.counts.tasks + merged.counts.planItems + merged.counts.notes;

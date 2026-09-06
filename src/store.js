@@ -2,7 +2,8 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { defaultAutomationRules, defaultTemplates, normalizeRule, normalizeTemplate } = require('./productivity-engine');
 
-const CURRENT_VERSION = 7;
+const CURRENT_VERSION = 8;
+const SUPPORTED_LOCALES = ['system', 'ja', 'en', 'zh-CN', 'zh-TW', 'ko', 'es', 'fr', 'de', 'pt-BR', 'hi', 'ar'];
 
 function todayKey(date = new Date()) {
   const year = date.getFullYear();
@@ -21,6 +22,7 @@ function defaultState() {
       intention: '今日いちばん大切なことを、静かに前へ進める。'
     },
     settings: {
+      locale: 'system',
       theme: 'violet',
       appearance: 'system',
       accentColor: '#8f7cf7',
@@ -154,6 +156,7 @@ function normalizeState(input, { incrementLaunch = false } = {}) {
   state.settings.weeklyGoal = Math.min(50, Math.max(1, Number(state.settings.weeklyGoal) || 12));
   state.settings.volume = Math.min(1, Math.max(0, Number(state.settings.volume) || 0));
   state.settings.customFocusMinutes = Math.min(180, Math.max(5, Number(state.settings.customFocusMinutes) || 40));
+  state.settings.locale = SUPPORTED_LOCALES.includes(input.settings?.locale) ? input.settings.locale : 'system';
   state.settings.theme = ['violet', 'cyan', 'amber', 'custom'].includes(state.settings.theme) ? state.settings.theme : 'violet';
   state.settings.appearance = ['light', 'dark', 'system'].includes(input.settings?.appearance)
     ? input.settings.appearance
