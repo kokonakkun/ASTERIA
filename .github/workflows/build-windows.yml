@@ -5,6 +5,8 @@ on:
   push:
     tags:
       - "v*"
+      # v4.0.0 is published from the locally validated release artifact.
+      - "!v4.0.0"
 
 permissions:
   contents: write
