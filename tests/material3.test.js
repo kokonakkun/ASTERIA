@@ -10,7 +10,7 @@ const css = fs.readFileSync(path.join(root, 'src', 'renderer', 'material3.css'),
 test('Material Design 3 layer is enabled by the application shell', () => {
   assert.match(html, /data-design="material3"/);
   assert.match(html, /href="material3\.css"/);
-  assert.match(html, /class="version">4\.0</);
+  assert.match(html, /class="version">4\.5</);
 });
 
 test('semantic color roles cover primary, surface, outline, inverse and error states', () => {
@@ -56,7 +56,13 @@ test('version 4 NEXUS surfaces expose automation, templates, and diagnostics', (
   assert.match(html, /id="automationModal"/);
   assert.match(html, /id="templateModal"/);
   assert.match(html, /src="\.\.\/productivity-engine\.js"/);
-  assert.match(css, /AST(?:ERIA)? 4\.0 — NEXUS|ASTERIA 4\.0 — NEXUS/);
+  assert.match(css, /ASTERIA 4\.5 — NEXUS/);
+});
+
+test('version 4.5 adds locale selection and RTL-aware layout', () => {
+  assert.match(html, /id="settingLocale"/);
+  assert.match(html, /src="locales\.js"/);
+  assert.match(css, /html\[dir="rtl"\]/);
 });
 
 test('core text and container pairs meet WCAG AA contrast', () => {

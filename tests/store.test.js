@@ -8,7 +8,7 @@ const { conflictIds, autoPlan } = require('../src/renderer/planning');
 
 test('default state is immediately usable', () => {
   const state = defaultState();
-  assert.equal(state.version, 7);
+  assert.equal(state.version, 8);
   assert.ok(Array.isArray(state.tasks));
   assert.ok(state.tasks.length >= 1);
   assert.equal(state.habits.length, 2);
@@ -18,6 +18,7 @@ test('default state is immediately usable', () => {
   assert.equal(state.projects.length, 1);
   assert.equal(state.tasks[0].status, 'next');
   assert.equal(state.settings.appearance, 'system');
+  assert.equal(state.settings.locale, 'system');
   assert.equal(state.settings.accentColor, '#8f7cf7');
   assert.deepEqual(state.integrations.history, []);
   assert.equal(state.automations.rules.length, 5);
@@ -37,7 +38,7 @@ test('normalization repairs incomplete data and clamps settings', () => {
 
 test('version 1 data migrates without inventing user habits', () => {
   const state = normalizeState({ version: 1, tasks: [], focusSessions: [], notes: 'legacy' });
-  assert.equal(state.version, 7);
+  assert.equal(state.version, 8);
   assert.equal(state.notes, 'legacy');
   assert.deepEqual(state.habits, []);
   assert.equal(state.focusRuntime.phase, 'focus');
@@ -45,7 +46,7 @@ test('version 1 data migrates without inventing user habits', () => {
 
 test('older tasks gain safe recurrence, subtask, and estimate defaults', () => {
   const state = normalizeState({ version: 2, tasks: [{ id: 'a', title: 'legacy task' }], focusSessions: [] });
-  assert.equal(state.version, 7);
+  assert.equal(state.version, 8);
   assert.equal(state.tasks[0].recurrence, 'none');
   assert.deepEqual(state.tasks[0].subtasks, []);
   assert.equal(state.tasks[0].estimatedMinutes, 25);
@@ -61,7 +62,7 @@ test('version 3 tasks migrate estimates and auto-plan metadata safely', () => {
     focusSessions: [],
     planItems: [{ id: 'p', title: 'generated', date: '2026-09-04', time: '10:00', duration: 25, autoPlanned: 1 }]
   });
-  assert.equal(state.version, 7);
+  assert.equal(state.version, 8);
   assert.equal(state.tasks[0].estimatedMinutes, 240);
   assert.equal(state.planItems[0].autoPlanned, true);
 });
@@ -73,7 +74,7 @@ test('version 4 projects and board statuses migrate without losing relationships
     tasks: [{ id: 'task-a', title: 'Blocked', status: 'waiting', projectId: 'project-a', done: false }],
     focusSessions: []
   });
-  assert.equal(state.version, 7);
+  assert.equal(state.version, 8);
   assert.equal(state.projects[0].name, 'Launch');
   assert.equal(state.tasks[0].status, 'waiting');
   assert.equal(state.tasks[0].projectId, 'project-a');
@@ -81,7 +82,7 @@ test('version 4 projects and board statuses migrate without losing relationships
 
 test('version 5 appearance migrates to dark without changing the familiar look', () => {
   const state = normalizeState({ version: 5, settings: { theme: 'cyan' }, tasks: [], focusSessions: [] });
-  assert.equal(state.version, 7);
+  assert.equal(state.version, 8);
   assert.equal(state.settings.appearance, 'dark');
   assert.equal(state.settings.accentColor, '#27b8c0');
   assert.equal(state.settings.motionIntensity, 'expressive');
@@ -110,7 +111,7 @@ test('version 6 workspaces gain NEXUS defaults without losing 3.0 preferences or
     tasks: [],
     focusSessions: []
   });
-  assert.equal(state.version, 7);
+  assert.equal(state.version, 8);
   assert.equal(state.settings.appearance, 'light');
   assert.equal(state.settings.accentColor, '#e91e63');
   assert.equal(state.settings.motionIntensity, 'gentle');

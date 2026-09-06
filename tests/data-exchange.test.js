@@ -115,7 +115,7 @@ test('ASTERIA JSON backup restores the complete normalized state', () => {
   const backup = serializeExport('backup', source);
   const imported = parseImport('ASTERIA-backup.json', backup.content);
   const restored = mergeImport(defaultState(), imported).state;
-  assert.equal(restored.version, 7);
+  assert.equal(restored.version, 8);
   assert.equal(restored.notes, 'backup payload');
   assert.equal(restored.settings.appearance, 'light');
   assert.equal(restored.settings.accentColor, '#e91e63');
