@@ -12,6 +12,7 @@
     '本文へ移動': 'Skip to content',
     'ASTERIA ホーム': 'ASTERIA Home',
     'メインナビゲーション': 'Main navigation',
+    '製品情報': 'Product information',
     'ライトテーマに切り替える': 'Switch to light theme',
     'ダークテーマに切り替える': 'Switch to dark theme',
     'ASTERIAのダッシュボード画面': 'ASTERIA dashboard preview',
