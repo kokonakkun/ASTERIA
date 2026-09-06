@@ -23,5 +23,6 @@ test('official site exposes the same eleven locale identifiers and privacy promi
   assert.match(html, /11言語/);
   assert.match(html, /外部の翻訳サービスへ送信しません/);
   assert.match(locales, /document\.documentElement\.dir/);
+  assert.match(locales, /'製品情報': 'Product information'/);
   assert.match(app, /asteria-site-locale/);
 });
