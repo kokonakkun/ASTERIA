@@ -1,6 +1,6 @@
 {
   "name": "asteria-command-center",
-  "version": "4.0.0",
+  "version": "4.5.0",
   "description": "ASTERIA - an offline personal command center for Windows",
   "main": "src/main.js",
   "author": "ASTERIA Studio",

@@ -1,12 +1,12 @@
 <div align="center">
   <img src="assets/icon.svg" width="96" height="96" alt="ASTERIA icon">
-  <h1>ASTERIA 4.0</h1>
+  <h1>ASTERIA 4.5</h1>
   <p><strong>散らばった予定、ミッション、集中、記録を、ひとつの静かな軌道へ。</strong></p>
   <p>Windows向け・オフラインファーストのパーソナルコマンドセンター。</p>
   <p>
-    <img alt="Version 4.0.0" src="https://img.shields.io/badge/version-4.0.0-6750A4?style=flat-square">
+    <img alt="Version 4.5.0" src="https://img.shields.io/badge/version-4.5.0-6750A4?style=flat-square">
     <img alt="Windows x64" src="https://img.shields.io/badge/platform-Windows_x64-0078D4?style=flat-square">
-    <img alt="44 tests passing" src="https://img.shields.io/badge/tests-44%2F44_passing-138A5B?style=flat-square">
+    <img alt="51 tests passing" src="https://img.shields.io/badge/tests-51%2F51_passing-138A5B?style=flat-square">
     <img alt="MIT License" src="https://img.shields.io/badge/license-MIT-242038?style=flat-square">
   </p>
   <p>
@@ -24,10 +24,26 @@ Markdownログ、分析、データ交換を一つにまとめたWindowsデス�
 個人データは端末内に保存され、利用にアカウントやクラウド接続を必要としません。
 
 > **配布版について**
-> 最新版はGitHub Releasesの `ASTERIA-4.0.0-portable.exe` です。
+> 最新版はGitHub Releasesの `ASTERIA-4.5.0-portable.exe` です。
 > インストールは不要です。現在の配布版はAuthenticode未署名のため、初回起動時に
 > Windows SmartScreenが警告を表示する場合があります。公開しているSHA-256と
 > 照合してから実行してください。
+
+## 4.5 — Global Language Update
+
+ASTERIA 4.5は、表示言語をアプリ内に完全収録しました。OS言語の自動判定または設定画面から、
+日本語、英語、簡体字中国語、繁体字中国語、韓国語、スペイン語、フランス語、ドイツ語、
+ブラジルポルトガル語、ヒンディー語、アラビア語へ再起動なしで切り替えられます。
+
+- オフラインで動作する11言語パックと英語フォールバック
+- アラビア語のRTLレイアウト
+- `Intl`による言語別の日付・数値表記
+- 言語設定を含むデータスキーマ8への安全な自動移行
+- Windows通知、トレイメニュー、ファイルダイアログのローカライズ
+- 11言語を切り替えられる公式サイト
+
+翻訳はローカル資産のみを使います。ユーザーのミッション、ログ、予定を外部翻訳サービスへ
+送信することはありません。
 
 ## 4.0 — Nexus Intelligence Update
 
@@ -67,11 +83,11 @@ ASTERIAはサービスのパスワード、トークン、クラウド認証情�
 
 ## クイックスタート
 
-1. [Releases](https://github.com/kokonakkun/ASTERIA/releases/latest)から `ASTERIA-4.0.0-portable.exe` をダウンロードします。
+1. [Releases](https://github.com/kokonakkun/ASTERIA/releases/latest)から `ASTERIA-4.5.0-portable.exe` をダウンロードします。
 2. 必要に応じてPowerShellでSHA-256を照合します。
 
    ```powershell
-   Get-FileHash .\ASTERIA-4.0.0-portable.exe -Algorithm SHA256
+   Get-FileHash .\ASTERIA-4.5.0-portable.exe -Algorithm SHA256
    ```
 
 3. EXEを任意のフォルダーに置いて起動します。個人データはWindowsのアプリデータ領域に
@@ -80,7 +96,7 @@ ASTERIAはサービスのパスワード、トークン、クラウド認証情�
 正しいSHA-256:
 
 ```text
-E819C37BA8D40965B5CD13611896D8ED124620867E778B23098EDBAB18A74BB6
+3EB24089CC58026EB66538B6E904B607C379BD0AF106CF5100B390922F1C13FB
 ```
 
 詳しい操作は[スタートガイド](docs/guide/getting-started.md)を参照してください。
@@ -111,8 +127,8 @@ Windows x64向けポータブル版を生成する場合:
 npm run build:portable
 ```
 
-現行版はNode単体・統合テスト **44 / 44**、Electron実機UIテストは通常画面と
-最小画面（1040×680）の双方で **88 / 88** を通過しています。品質と配布検証の詳細は
+現行版はNode単体・統合テスト **51 / 51**、Electron実機UIテストは通常画面と
+最小画面（1040×680）の双方で **93 / 93** を通過しています。品質と配布検証の詳細は
 [検証記録](docs/verification.md)にまとめています。
 
 ## セキュリティとプライバシー
@@ -131,8 +147,9 @@ npm run build:portable
 
 ASTERIA is an offline-first personal command center for Windows. It unifies missions,
 planning, focus sessions, habits, notes, insights, local automations, templates, and
-interoperable file exchange in a private desktop workspace. No account is required,
-and ASTERIA stores no cloud credentials.
+interoperable file exchange in a private desktop workspace. Version 4.5 includes eleven
+offline interface languages with system detection and Arabic RTL. No account is required,
+and ASTERIA stores no cloud credentials or sends user content to translation services.
 
 ## License
 
