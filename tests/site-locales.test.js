@@ -11,7 +11,7 @@ const app = fs.readFileSync(path.join(root, 'docs', 'app.js'), 'utf8');
 test('official site presents ASTERIA 4.5 and loads localization before behavior', () => {
   assert.match(html, /ASTERIA 4\.5/);
   assert.doesNotMatch(html, /ASTERIA 4\.0/);
-  assert.match(html, /<script src="locales\.js\?v=4\.5\.0" defer><\/script>\s*<script src="app\.js\?v=4\.5\.0" defer><\/script>/);
+  assert.match(html, /<script src="locales\.js\?v=4\.5\.0-global" defer><\/script>\s*<script src="app\.js\?v=4\.5\.0" defer><\/script>/);
   assert.match(html, /styles\.css\?v=4\.5\.0/);
   assert.match(html, /data-locale-select/);
   assert.match(html, /GLOBAL LANGUAGE UPDATE/);
