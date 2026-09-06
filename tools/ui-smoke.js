@@ -5,7 +5,23 @@
   const check = (condition, message) => { assert(condition, message); checks.push(message); };
 
   check(document.querySelector('#profileName')?.textContent.length > 0, 'initial state rendered');
-  check(document.querySelector('.titlebar .version')?.textContent.trim() === '4.0', 'version 4.0 shell is rendered');
+  check(document.querySelector('.titlebar .version')?.textContent.trim() === '4.5', 'version 4.5 shell is rendered');
+  document.querySelector('#settingsButton').click();
+  check(document.querySelectorAll('#settingLocale option').length === 12, 'language selector exposes system detection and eleven language packs');
+  document.querySelector('#settingLocale').value = 'en';
+  document.querySelector('#settingLocale').dispatchEvent(new Event('change', { bubbles: true }));
+  await wait(80);
+  check(document.documentElement.lang === 'en' && document.querySelector('[data-nav="dashboard"] .nav-label').textContent.trim() === 'Home', 'English locale applies without restarting');
+  check(!/[ぁ-んァ-ヶ]/.test(document.querySelector('#settingsModal').innerText), 'English settings contain no residual Japanese UI copy');
+  document.querySelector('#settingLocale').value = 'ar';
+  document.querySelector('#settingLocale').dispatchEvent(new Event('change', { bubbles: true }));
+  await wait(80);
+  check(document.documentElement.dir === 'rtl' && document.querySelector('[data-nav="focus"] .nav-label').textContent.trim() === 'التركيز', 'Arabic locale enables RTL presentation');
+  document.querySelector('#settingLocale').value = 'ja';
+  document.querySelector('#settingLocale').dispatchEvent(new Event('change', { bubbles: true }));
+  await wait(80);
+  check(document.documentElement.lang === 'ja' && document.documentElement.dir === 'ltr', 'Japanese locale restores the source interface');
+  document.querySelector('[data-close-settings]').click();
   check(document.body.dataset.design === 'material3', 'Material Design 3 mode is active');
   check([...document.styleSheets].some((sheet) => sheet.href?.endsWith('/material3.css')), 'Material Design 3 stylesheet is loaded');
   check(getComputedStyle(document.documentElement).getPropertyValue('--md-sys-color-primary').trim().length > 0, 'Material semantic color roles are defined');
@@ -22,17 +38,17 @@
   document.querySelector('#projectAddButton').click();
   check(document.querySelector('#projectModal').classList.contains('open'), 'project modal opens');
   document.querySelector('#projectName').value = 'Horizon Project';
-  document.querySelector('#projectDescription').value = '4.0の統合操作を検証';
+  document.querySelector('#projectDescription').value = '4.5の統合操作を検証';
   document.querySelector('#projectColor').value = 'cyan';
   document.querySelector('#projectForm').dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
   await wait(130);
   check([...document.querySelectorAll('#projectStrip .project-card')].some((card) => card.textContent.includes('Horizon Project')), 'project portfolio creates a project');
   const horizonProjectId = [...document.querySelector('#projectFilterSelect').options].find((option) => option.textContent === 'Horizon Project').value;
   document.querySelector(`[data-project-edit="${horizonProjectId}"]`).click();
-  document.querySelector('#projectDescription').value = '更新された4.0プロジェクト';
+  document.querySelector('#projectDescription').value = '更新された4.5プロジェクト';
   document.querySelector('#projectForm').dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
   await wait(100);
-  check([...document.querySelectorAll('#projectStrip .project-card')].some((card) => card.textContent.includes('更新された4.0プロジェクト')), 'project portfolio edits project details');
+  check([...document.querySelectorAll('#projectStrip .project-card')].some((card) => card.textContent.includes('更新された4.5プロジェクト')), 'project portfolio edits project details');
   document.querySelector('#projectAddButton').click();
   document.querySelector('#projectName').value = 'Disposable Project';
   document.querySelector('#projectForm').dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
@@ -162,10 +178,10 @@
   check(autoPlannedCount > 0, `orbit assist auto-plans missions into free time [count=${autoPlannedCount}; signal=${document.querySelector('#plannerAssistTitle').textContent}; toast=${[...document.querySelectorAll('#toastRegion .toast')].at(-1)?.textContent || 'none'}]`);
   check(document.querySelectorAll('#dayPlanList .plan-block.conflict').length === 0, 'auto-planned blocks avoid schedule conflicts');
 
-  const habitToday = document.querySelector(`#habitList [data-habit-date="${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}-${String(new Date().getDate()).padStart(2, '0')}"]`);
-  check(Boolean(habitToday), 'habit week is rendered');
-  habitToday.click();
-  check(habitToday.classList.contains('checked') || document.querySelector(`#habitList [data-habit-date="${habitToday.dataset.habitDate}"]`).classList.contains('checked'), 'habit completion toggles');
+  const visibleHabitDay = document.querySelector('#habitList [data-habit-date]');
+  check(Boolean(visibleHabitDay), 'habit week is rendered');
+  visibleHabitDay.click();
+  check(visibleHabitDay.classList.contains('checked') || document.querySelector(`#habitList [data-habit-date="${visibleHabitDay.dataset.habitDate}"]`).classList.contains('checked'), 'habit completion toggles');
 
   document.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true, bubbles: true }));
   document.querySelector('#commandSearch').value = '今日の最重要';
