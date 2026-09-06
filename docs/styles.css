@@ -1,4 +1,4 @@
-/* ASTERIA 4.0 product page — local, dependency-free, Material 3 inspired. */
+/* ASTERIA 4.5 product page — local, dependency-free, Material 3 inspired. */
 
 :root {
   color-scheme: dark;
@@ -266,6 +266,53 @@ svg {
   align-items: center;
   gap: 10px;
 }
+
+.locale-control {
+  height: 42px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 8px 0 11px;
+  border: 1px solid var(--outline-variant);
+  border-radius: 999px;
+  color: var(--on-surface-variant);
+  background: color-mix(in srgb, var(--surface-container) 82%, transparent);
+}
+
+.locale-control svg {
+  width: 17px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+}
+
+.locale-control select {
+  width: 106px;
+  border: 0;
+  outline: 0;
+  color: inherit;
+  background: transparent;
+  font: 700 12px/1 var(--font-sans);
+  cursor: pointer;
+}
+
+.locale-control option { color: #19151f; background: #fff; }
+.visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+html[dir="rtl"] body { direction: rtl; }
+html[dir="rtl"] .site-header,
+html[dir="rtl"] .hero,
+html[dir="rtl"] .feature-row,
+html[dir="rtl"] .download-card { direction: rtl; }
 
 .icon-button {
   display: grid;
@@ -781,6 +828,28 @@ html[data-resolved-theme="light"] .theme-icon-sun {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 20px;
+}
+
+.language-banner {
+  max-width: 1120px;
+  margin: 0 auto 34px;
+  padding: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 9px;
+  border: 1px solid var(--outline-soft);
+  border-radius: 24px;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--primary-container) 55%, transparent), color-mix(in srgb, var(--surface-container) 90%, transparent));
+}
+
+.language-banner span {
+  padding: 8px 12px;
+  border-radius: 999px;
+  color: var(--on-surface-variant);
+  background: var(--surface-high);
+  font-size: 12px;
+  font-weight: 750;
 }
 
 .feature-card {
@@ -1562,6 +1631,9 @@ kbd {
   .version-chip {
     display: none;
   }
+
+  .locale-control { padding-inline: 8px; }
+  .locale-control select { width: 78px; }
 
   .header-actions .button-small {
     width: 42px;

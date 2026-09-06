@@ -4,13 +4,13 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#0f0d15">
-    <meta name="description" content="ASTERIA 4.0 — Windows向け、オフラインファーストのパーソナルコマンドセンター。">
-    <meta property="og:title" content="ASTERIA 4.0">
+    <meta name="description" content="ASTERIA 4.5 — 11言語対応の、Windows向けオフラインファースト・パーソナルコマンドセンター。">
+    <meta property="og:title" content="ASTERIA 4.5">
     <meta property="og:description" content="散らばった予定、ミッション、集中、記録を、ひとつの静かな軌道へ。">
     <meta property="og:type" content="website">
     <meta property="og:image" content="assets/dashboard-light.png">
     <meta name="twitter:card" content="summary_large_image">
-    <title>ASTERIA 4.0 — Personal Command Center</title>
+    <title>ASTERIA 4.5 — Personal Command Center</title>
     <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
     <link rel="manifest" href="site.webmanifest">
     <link rel="stylesheet" href="styles.css">
@@ -21,6 +21,7 @@
         if (saved === 'light' || saved === 'dark') document.documentElement.dataset.theme = saved;
       })();
     </script>
+    <script src="locales.js" defer></script>
     <script src="app.js" defer></script>
   </head>
   <body>
@@ -30,7 +31,7 @@
       <a class="brand" href="#top" aria-label="ASTERIA ホーム">
         <img src="assets/icon.svg" width="34" height="34" alt="">
         <span>ASTERIA</span>
-        <span class="version-chip">4.0</span>
+        <span class="version-chip">4.5</span>
       </a>
 
       <nav class="desktop-nav" aria-label="メインナビゲーション">
@@ -41,6 +42,11 @@
       </nav>
 
       <div class="header-actions">
+        <label class="locale-control">
+          <span class="visually-hidden">言語</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.2 3 14.8 0 18M12 3c-3 3.2-3 14.8 0 18"/></svg>
+          <select data-locale-select aria-label="言語"></select>
+        </label>
         <button class="icon-button" type="button" data-theme-toggle aria-label="テーマを切り替える">
           <svg class="theme-icon theme-icon-sun" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10Zm0-5v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/></svg>
           <svg class="theme-icon theme-icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5a8.5 8.5 0 1 0 10.7 10.7Z"/></svg>
@@ -59,8 +65,8 @@
         <div class="orbit orbit-two" aria-hidden="true"></div>
 
         <div class="hero-copy reveal">
-          <p class="eyebrow"><span class="status-dot"></span>NEXUS INTELLIGENCE UPDATE</p>
-          <h1>毎日を、<br><span>静かな軌道</span>へ。</h1>
+          <p class="eyebrow"><span class="status-dot"></span>GLOBAL LANGUAGE UPDATE</p>
+          <h1>毎日を、<br><span>静かな軌道へ。</span></h1>
           <p class="hero-lead">
             予定、ミッション、集中、習慣、記録。ASTERIAは、散らばった毎日を
             一つの美しいワークスペースへまとめるWindowsアプリです。
@@ -71,12 +77,13 @@
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 20h14"/></svg>
             </a>
             <a class="button button-tonal" href="#nexus">
-              4.0を見る
+              4.5を見る
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
             </a>
           </div>
           <div class="hero-trust" aria-label="製品情報">
-            <span><strong>4.0.0</strong> Latest</span>
+            <span><strong>4.5.0</strong> Latest</span>
+            <span><strong>11</strong> Languages</span>
             <span><strong>Windows</strong> x64</span>
             <span><strong>Offline</strong> First</span>
             <span><strong>MIT</strong> License</span>
@@ -87,10 +94,10 @@
           <div class="window-glow" aria-hidden="true"></div>
           <div class="app-window">
             <div class="window-bar" aria-hidden="true">
-              <span class="window-brand"><span class="status-dot"></span>ASTERIA SYSTEM <b>4.0</b></span>
+              <span class="window-brand"><span class="status-dot"></span>ASTERIA SYSTEM <b>4.5</b></span>
               <span class="window-secure"><i></i>LOCAL / SECURE</span>
             </div>
-            <img src="assets/dashboard-light.png" width="1440" height="900" alt="ASTERIA 4.0のホームダッシュボード" fetchpriority="high">
+            <img src="assets/dashboard-light.png" width="1440" height="900" alt="ASTERIA 4.5のホームダッシュボード" fetchpriority="high">
           </div>
           <div class="floating-card floating-local" aria-hidden="true">
             <span class="floating-icon">◎</span>
@@ -112,12 +119,17 @@
 
       <section class="section intro-section" id="nexus">
         <div class="section-heading reveal">
-          <p class="eyebrow">LOCAL INTELLIGENCE / NEXUS 4.0</p>
-          <h2>あなたの仕事を理解する。<br>あなたに代わって決めつけない。</h2>
+          <p class="eyebrow">GLOBAL INTERFACE / ASTERIA 4.5</p>
+          <h2>11言語。ひとつの静かな体験。</h2>
           <p>
-            NEXUSは、何が起きるかを常に見せるローカル知能層です。ルール、展開、修復は
-            端末内で完結し、結果は監査でき、直後なら元に戻せます。
+            OS言語を自動検出し、設定からいつでも切り替えられます。翻訳はすべてアプリに内蔵され、
+            タスクやログを外部の翻訳サービスへ送信しません。
           </p>
+        </div>
+
+        <div class="language-banner reveal" aria-label="11の対応言語">
+          <span>日本語</span><span>English</span><span>简体中文</span><span>繁體中文</span><span>한국어</span>
+          <span>Español</span><span>Français</span><span>Deutsch</span><span>Português</span><span>हिन्दी</span><span>العربية</span>
         </div>
 
         <div class="nexus-grid">
@@ -230,7 +242,7 @@
         <div class="privacy-copy reveal">
           <p class="eyebrow"><span class="status-dot"></span>LOCAL / SECURE</p>
           <h2>あなたの毎日は、<br>あなたの端末に。</h2>
-          <p>アカウントも、テレメトリも、クラウド認証情報も不要。ASTERIA 4.0は、個人データを外部へ自動送信しません。</p>
+          <p>アカウントも、テレメトリも、クラウド認証情報も不要。ASTERIA 4.5は、個人データを外部へ自動送信しません。</p>
           <a class="text-link" href="privacy.md">プライバシー設計を読む <span>→</span></a>
         </div>
         <div class="privacy-facts reveal reveal-delay">
@@ -245,7 +257,7 @@
         <div class="download-card reveal">
           <div class="download-copy">
             <p class="eyebrow">READY FOR YOUR ORBIT</p>
-            <h2>ASTERIA 4.0を始める。</h2>
+            <h2>ASTERIA 4.5を始める。</h2>
             <p>Windows x64 · ポータブル · インストール不要</p>
             <div class="download-actions">
               <a class="button button-filled button-large" href="../../releases/latest" data-release-link>
@@ -257,12 +269,12 @@
             <p class="unsigned-note"><span>!</span> 現在のEXEはAuthenticode未署名です。初回起動時にSmartScreenが表示される場合があります。</p>
           </div>
           <div class="download-meta">
-            <div><span>VERSION</span><strong>4.0.0</strong></div>
-            <div><span>SIZE</span><strong>81.55 MiB</strong></div>
+            <div><span>VERSION</span><strong>4.5.0</strong></div>
+            <div><span>SIZE</span><strong>81.49 MiB</strong></div>
             <div><span>LICENSE</span><strong>MIT</strong></div>
             <div class="hash-block">
               <span>SHA-256</span>
-              <code data-hash>E819C37BA8D40965B5CD13611896D8ED124620867E778B23098EDBAB18A74BB6</code>
+              <code data-hash>3EB24089CC58026EB66538B6E904B607C379BD0AF106CF5100B390922F1C13FB</code>
               <button type="button" class="copy-button" data-copy-hash>コピー</button>
             </div>
           </div>

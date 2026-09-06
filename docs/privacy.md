@@ -10,7 +10,7 @@ ASTERIAは**ローカルファースト**のデスクトップアプリです。
 
 ## 外部送信
 
-ASTERIA 4.0はアプリ画面から外部ネットワークへ接続しません。Content Security Policyの
+ASTERIA 4.5はアプリ画面から外部ネットワークへ接続しません。Content Security Policyの
 `connect-src`は`none`です。テレメトリ、広告SDK、クラウド分析、アカウント登録は
 ありません。
 

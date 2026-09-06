@@ -6,6 +6,20 @@
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const themeMeta = document.querySelector('meta[name="theme-color"]');
   const themeToggle = document.querySelector('[data-theme-toggle]');
+  const siteI18n = globalThis.AsteriaSiteI18n;
+  const localeSelect = document.querySelector('[data-locale-select]');
+
+  if (siteI18n && localeSelect) {
+    siteI18n.populate(localeSelect);
+    siteI18n.setLocale(siteI18n.selectedLocale());
+    localeSelect.value = siteI18n.selectedLocale();
+    localeSelect.addEventListener('change', () => {
+      localStorage.setItem('asteria-site-locale', localeSelect.value);
+      siteI18n.setLocale(localeSelect.value);
+      localeSelect.value = siteI18n.selectedLocale();
+      syncTheme();
+    });
+  }
 
   const resolvedTheme = () => {
     const selected = root.dataset.theme || 'system';
@@ -17,9 +31,10 @@
     root.dataset.resolvedTheme = resolved;
     if (themeMeta) themeMeta.content = resolved === 'dark' ? '#0d0c12' : '#fbf8ff';
     if (themeToggle) {
-      const next = resolved === 'dark' ? 'ライト' : 'ダーク';
-      themeToggle.setAttribute('aria-label', `${next}テーマに切り替える`);
-      themeToggle.title = `${next}テーマに切り替える`;
+      const source = resolved === 'dark' ? 'ライトテーマに切り替える' : 'ダークテーマに切り替える';
+      const next = siteI18n?.t(source) || source;
+      themeToggle.setAttribute('aria-label', next);
+      themeToggle.title = next;
     }
   };
 
@@ -154,7 +169,7 @@
       toast.setAttribute('aria-live', 'polite');
       document.body.append(toast);
     }
-    toast.textContent = message;
+    toast.textContent = siteI18n?.t(message) || message;
     toast.classList.add('is-visible');
     window.clearTimeout(toastTimer);
     toastTimer = window.setTimeout(() => toast.classList.remove('is-visible'), 2400);

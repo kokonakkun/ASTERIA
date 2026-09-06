@@ -1,6 +1,6 @@
-# ASTERIA 4.0 検証記録
+# ASTERIA 4.5 検証記録
 
-検証日: 2026-09-05
+検証日: 2026-09-06
 
 総合判定: **RELEASE READY（未署名ポータブル版）**
 
@@ -8,36 +8,37 @@
 
 | 項目 | 値 |
 |---|---|
-| ファイル | `ASTERIA-4.0.0-portable.exe` |
+| ファイル | `ASTERIA-4.5.0-portable.exe` |
 | 対象 | Windows x64 |
 | 形式 | インストール不要ポータブルEXE |
-| サイズ | 85,516,339 bytes（81.55 MiB） |
-| ProductVersion | 4.0.0 |
+| サイズ | 85,450,546 bytes（81.49 MiB） |
+| ProductVersion | 4.5.0 |
 | Electron | 38.8.6 |
 | electron-builder | 26.15.3 |
-| データスキーマ | 7 |
+| データスキーマ | 8 |
 | Authenticode | NotSigned |
 
 SHA-256:
 
 ```text
-E819C37BA8D40965B5CD13611896D8ED124620867E778B23098EDBAB18A74BB6
+3EB24089CC58026EB66538B6E904B607C379BD0AF106CF5100B390922F1C13FB
 ```
 
 ## 自動テスト
 
-- Node単体・統合テスト: **44 / 44 PASS**
-- Electron実機UIテスト（通常サイズ）: **88 / 88 PASS**
-- Electron実機UIテスト（最小1040×680）: **88 / 88 PASS**
+- Node単体・統合テスト: **51 / 51 PASS**
+- Electron実機UIテスト（通常サイズ）: **93 / 93 PASS**
+- Electron実機UIテスト（最小1040×680）: **93 / 93 PASS**
 - npm依存監査: **0 vulnerabilities**（検証時点）
 
-テスト対象には、旧スキーマ1〜6からの移行、2.1実データ保持、自動化の冪等性、
+テスト対象には、旧スキーマ1〜7からの移行、11言語パック、英語フォールバック、
+アラビア語RTL、地域別日付・数値、2.1実データ保持、自動化の冪等性、
 予定衝突、テンプレート展開、横断検索、診断修復、CSV安全化、各交換形式、破損ストア
 回復、CSP、Electron分離設定、ARIAモーダル情報を含みます。
 
 ## 配布版の実機確認
 
-- `app.asar`にNEXUS、Bridge、Material Design 3の実装を確認
+- `app.asar`に11言語パック、NEXUS、Bridge、Material Design 3の実装を確認
 - `win-unpacked`版と最終ポータブルEXEを起動し、NEXUS診断画面を描画
 - スクリーンショット保存後にプロセスが正常終了
 - Microsoft DefenderのEXE個別CustomScanで検出増加なし
@@ -53,6 +54,7 @@ E819C37BA8D40965B5CD13611896D8ED124620867E778B23098EDBAB18A74BB6
 - CSV数式プレフィックスを無害化
 - 自動化で任意スクリプトを実行しない
 - 外部サービスの認証情報を保存しない
+- 翻訳は内蔵資産のみを使い、ユーザー入力を外部へ送信しない
 
 ## 既知の配布上の制約
 
