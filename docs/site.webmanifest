@@ -1,0 +1,17 @@
+{
+  "name": "ASTERIA 4.0",
+  "short_name": "ASTERIA",
+  "description": "Windows向け、オフラインファーストのパーソナルコマンドセンター。",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#0d0c12",
+  "theme_color": "#6750a4",
+  "icons": [
+    {
+      "src": "assets/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
