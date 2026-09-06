@@ -1,0 +1,45 @@
+name: 機能提案
+description: ASTERIAをより良くするアイデアを提案します
+title: "[Idea]: "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: 解決したいこと
+      description: 機能名より先に、困っている状況や目的を教えてください。
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: 提案
+      description: どのように動くと良いかを書いてください。
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: 現在の代替手段
+      description: 今はどのように対処していますか。
+  - type: dropdown
+    id: principle
+    attributes:
+      label: 関連領域
+      options:
+        - ミッション / プロジェクト
+        - プラン / 習慣
+        - 集中 / ログ
+        - NEXUS
+        - Bridge / データ交換
+        - テーマ / アクセシビリティ
+        - その他
+    validations:
+      required: true
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: 確認
+      options:
+        - label: 同じ内容のIssueがないか検索しました
+          required: true

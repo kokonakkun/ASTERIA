@@ -1,0 +1,58 @@
+name: バグ報告
+description: 再現可能な不具合を報告します
+title: "[Bug]: "
+labels: ["bug", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        報告ありがとうございます。個人データや秘密情報は添付しないでください。
+        セキュリティ上の問題は公開Issueではなく、Securityタブから非公開で報告してください。
+  - type: input
+    id: version
+    attributes:
+      label: ASTERIAのバージョン
+      placeholder: 例 4.0.0
+    validations:
+      required: true
+  - type: dropdown
+    id: windows
+    attributes:
+      label: Windows
+      options:
+        - Windows 11
+        - Windows 10
+        - その他
+    validations:
+      required: true
+  - type: textarea
+    id: summary
+    attributes:
+      label: 起きたこと
+      description: 期待した結果と、実際の結果を簡潔に書いてください。
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: 再現手順
+      placeholder: |
+        1. …を開く
+        2. …を押す
+        3. …が表示される
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: 補足
+      description: テーマ、画面サイズ、ログ、スクリーンショットなど。個人情報は伏せてください。
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: 確認
+      options:
+        - label: 同じ内容のIssueがないか検索しました
+          required: true
+        - label: 個人データ、トークン、パスワードを含めていません
+          required: true
