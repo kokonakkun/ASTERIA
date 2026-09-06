@@ -21,7 +21,7 @@
       <div class="titlebar-brand">
         <span class="signal-dot"></span>
         <span>ASTERIA SYSTEM</span>
-        <span class="version">4.0</span>
+        <span class="version">4.5</span>
       </div>
       <div class="drag-region"></div>
       <div class="system-state"><span class="online-dot"></span> LOCAL / SECURE</div>
@@ -183,7 +183,7 @@
 
         <section class="view" id="missionsView" data-view="missions">
           <div class="page-heading">
-            <div><p class="eyebrow">MISSION CONTROL 4.0</p><h1>ミッション</h1><p class="subtitle">プロジェクトから次の一手まで、ひとつの軌道に。</p></div>
+            <div><p class="eyebrow">MISSION CONTROL 4.5</p><h1>ミッション</h1><p class="subtitle">プロジェクトから次の一手まで、ひとつの軌道に。</p></div>
             <div class="heading-actions"><button type="button" class="secondary-button" id="missionViewButton">ボード表示</button><button type="button" class="secondary-button" id="projectAddButton">＋ プロジェクト</button><button type="button" class="primary-button" id="missionAddButton"><span>＋</span> 新しいミッション</button></div>
           </div>
           <div class="project-strip" id="projectStrip"></div>
@@ -328,7 +328,7 @@
 
         <section class="view" id="nexusView" data-view="nexus">
           <div class="page-heading">
-            <div><p class="eyebrow">NEXUS 4.0</p><h1>ワークスペース知能</h1><p class="subtitle">自動化、テンプレート、診断を、すべて端末内で安全に。</p></div>
+            <div><p class="eyebrow">NEXUS 4.5</p><h1>ワークスペース知能</h1><p class="subtitle">自動化、テンプレート、診断を、すべて端末内で安全に。</p></div>
             <div class="heading-actions"><button type="button" class="secondary-button" id="nexusScanButton">◇ 健全性スキャン</button><button type="button" class="primary-button" id="nexusRunButton">✦ 自動化を実行</button></div>
           </div>
           <article class="panel nexus-hero">
@@ -361,7 +361,7 @@
 
         <section class="view" id="integrationsView" data-view="integrations">
           <div class="page-heading">
-            <div><p class="eyebrow">BRIDGE 4.0</p><h1>サービス連携</h1><p class="subtitle">認証情報を保存せず、標準ファイルでデータを安全に行き来させます。</p></div>
+            <div><p class="eyebrow">BRIDGE 4.5</p><h1>サービス連携</h1><p class="subtitle">認証情報を保存せず、標準ファイルでデータを安全に行き来させます。</p></div>
             <div class="heading-actions"><button type="button" class="secondary-button" id="integrationImportButton">⇩ インポート</button><button type="button" class="primary-button" id="integrationExportButton">⇧ エクスポート</button></div>
           </div>
           <div class="integration-summary">
@@ -460,6 +460,20 @@
     <form class="modal settings-modal" id="settingsForm" role="dialog" aria-modal="true" aria-labelledby="settingsModalTitle">
       <div class="modal-head"><div><p class="panel-label">SYSTEM CONFIG</p><h2 id="settingsModalTitle">設定</h2></div><button type="button" class="modal-close" data-close-settings>×</button></div>
       <label class="field"><span>表示名</span><input id="settingName" maxlength="40"></label>
+      <label class="field locale-field"><span>表示言語</span><select id="settingLocale" aria-label="表示言語">
+        <option value="system" data-i18n-skip>◉ System language</option>
+        <option value="ja" data-i18n-skip>日本語</option>
+        <option value="en" data-i18n-skip>English</option>
+        <option value="zh-CN" data-i18n-skip>简体中文</option>
+        <option value="zh-TW" data-i18n-skip>繁體中文</option>
+        <option value="ko" data-i18n-skip>한국어</option>
+        <option value="es" data-i18n-skip>Español</option>
+        <option value="fr" data-i18n-skip>Français</option>
+        <option value="de" data-i18n-skip>Deutsch</option>
+        <option value="pt-BR" data-i18n-skip>Português (Brasil)</option>
+        <option value="hi" data-i18n-skip>हिन्दी</option>
+        <option value="ar" data-i18n-skip>العربية</option>
+      </select><small>OSの言語を使用、または11言語から選択できます。</small></label>
       <label class="field"><span>週間セッション目標</span><input id="settingGoal" type="number" min="1" max="50"></label>
       <label class="field"><span>カスタム集中時間（分）</span><input id="settingCustomFocus" type="number" min="5" max="180"></label>
       <div class="field"><span>外観モード</span><div class="appearance-options" id="appearanceOptions"><button type="button" data-appearance="light">☀ ライト</button><button type="button" data-appearance="dark" class="active">◐ ダーク</button><button type="button" data-appearance="system">◉ システム</button></div></div>
@@ -519,6 +533,7 @@
   <div class="toast-region" id="toastRegion" aria-live="polite"></div>
   <script src="../productivity-engine.js"></script>
   <script src="planning.js"></script>
+  <script src="locales.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

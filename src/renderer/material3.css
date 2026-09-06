@@ -1,4 +1,4 @@
-/* ASTERIA 4.0 — Material Design 3 dynamic color and motion layer
+/* ASTERIA 4.5 — Material Design 3 dynamic color, motion and locale layer
    The original layout remains the functional foundation. This file owns the
    visual language: semantic color roles, type, shape, elevation and states. */
 
@@ -146,6 +146,24 @@ body[data-design="material3"] textarea,
 body[data-design="material3"] select {
   font-family: inherit;
 }
+
+.locale-field small {
+  margin-top: 7px;
+  color: var(--md-sys-color-on-surface-variant);
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+html[dir="rtl"] .titlebar,
+html[dir="rtl"] .sidebar,
+html[dir="rtl"] .window-controls { direction: ltr; }
+html[dir="rtl"] .main-area,
+html[dir="rtl"] .modal,
+html[dir="rtl"] .command-box,
+html[dir="rtl"] .toast-region { direction: rtl; text-align: right; }
+html[dir="rtl"] input,
+html[dir="rtl"] textarea,
+html[dir="rtl"] select { text-align: right; }
 
 body[data-design="material3"] button:focus-visible,
 body[data-design="material3"] input:focus-visible,
@@ -919,7 +937,7 @@ body[data-color-scheme="light"] .window-controls .close-button:hover { color: #f
 }
 .color-field .text-button { justify-self: end; }
 
-/* ASTERIA 4.0 — NEXUS local intelligence */
+/* ASTERIA 4.5 — NEXUS local intelligence */
 .nexus-hero {
   min-height: 150px;
   display: grid;

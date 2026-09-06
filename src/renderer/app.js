@@ -7,6 +7,8 @@
   const todayKey = (date = new Date()) => `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
   const escapeHtml = (value) => String(value ?? '').replace(/[&<>'"]/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[char]);
   const uid = () => globalThis.crypto?.randomUUID?.() || `id-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+  const i18n = globalThis.AsteriaI18n;
+  const tr = (source) => i18n?.t(source) || source;
 
   let state;
   let activeView = 'dashboard';
@@ -142,6 +144,7 @@
 
   async function initialize() {
     state = await window.asteria.load();
+    i18n?.start(state.settings.locale || 'system');
     const startupAutomation = engine.runAutomationRules(state);
     if (startupAutomation.rulesRun) {
       state = startupAutomation.state;
@@ -160,7 +163,7 @@
     initializeStarfield();
     audioEngine.configure(state.settings.soundscape, state.settings.volume);
     window.asteria.setCloseToTray(state.settings.closeToTray);
-    showToast('ASTERIA 4.0 ONLINE', focus.running ? '前回の集中タイマーを復元しました。' : 'Nexus Intelligence Update を起動しました。');
+    showToast('ASTERIA 4.5 ONLINE', focus.running ? '前回の集中タイマーを復元しました。' : 'Global Language Update を起動しました。');
   }
 
   function applyDisplayPreferences() {
@@ -337,6 +340,13 @@
     $('#settingReducedMotion').addEventListener('change', updateSettingsFromForm);
     $('#settingCloseToTray').addEventListener('change', updateSettingsFromForm);
     $('#settingMotionIntensity').addEventListener('change', updateSettingsFromForm);
+    $('#settingLocale').addEventListener('change', () => {
+      state.settings.locale = $('#settingLocale').value;
+      i18n?.setLocale(state.settings.locale);
+      buildCommandPalette();
+      renderAll();
+      scheduleSave();
+    });
     $('#appearanceOptions').addEventListener('click', (event) => {
       const button = event.target.closest('[data-appearance]');
       if (!button) return;
@@ -468,6 +478,7 @@
     renderSettings();
     updateFocusDisplay();
     renderChartsSoon();
+    i18n?.localize();
   }
 
   function startClock() {
@@ -476,8 +487,7 @@
       $('#liveClock').textContent = `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
       const hour = now.getHours();
       $('#greeting').textContent = hour < 5 ? '夜更けですね' : hour < 11 ? 'おはようございます' : hour < 17 ? 'こんにちは' : 'こんばんは';
-      const weekdays = ['日', '月', '火', '水', '木', '金', '土'];
-      $('#dateLabel').textContent = `${now.getFullYear()} / ${pad(now.getMonth() + 1)} / ${pad(now.getDate())} — ${weekdays[now.getDay()]}曜日`;
+      $('#dateLabel').textContent = i18n?.formatDate(now, { year: 'numeric', month: '2-digit', day: '2-digit', weekday: 'long' }) || now.toLocaleDateString('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit', weekday: 'long' });
       checkPlanReminders(now);
     };
     tick();
@@ -593,7 +603,7 @@
     const dueText = formatDue(task.due);
     const subtasks = Array.isArray(task.subtasks) ? task.subtasks : [];
     const subtaskDone = subtasks.filter((item) => item.done).length;
-    const recurrenceLabels = { daily: '毎日', weekdays: '平日', weekly: '毎週' };
+    const recurrenceLabels = { daily: tr('毎日'), weekdays: tr('平日'), weekly: tr('毎週') };
     const project = state.projects.find((item) => item.id === task.projectId);
     const projectColor = projectColors[project?.color] || '#777382';
     return `<div class="task-row ${task.done ? 'done' : ''}" data-task-id="${escapeHtml(task.id)}" style="--project-color:${projectColor}">
@@ -1038,14 +1048,18 @@
 
   function renderPlanner() {
     const date = parseLocalDate(plannerDate);
-    const weekdays = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
     $('#plannerView').classList.toggle('month-mode', plannerMode === 'month');
     $('#plannerView').classList.toggle('week-mode', plannerMode === 'week');
     $$('#plannerModeSwitch [data-planner-mode]').forEach((button) => button.classList.toggle('active', button.dataset.plannerMode === plannerMode));
     const week = plannerWeekDates();
     const weekEnd = parseLocalDate(week[6]);
-    $('#plannerWeekday').textContent = plannerMode === 'month' ? 'MONTH OVERVIEW' : plannerMode === 'week' ? 'WEEKLY COCKPIT' : `${weekdays[date.getDay()]}${plannerDate === todayKey() ? ' · TODAY' : ''}`;
-    $('#plannerDateLabel').textContent = plannerMode === 'month' ? `${date.getFullYear()}年${date.getMonth() + 1}月` : plannerMode === 'week' ? `${week[0].replaceAll('-', '/')} — ${weekEnd.getMonth() + 1}/${weekEnd.getDate()}` : `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`;
+    const localizedWeekday = i18n?.formatDate(date, { weekday: 'long' }) || date.toLocaleDateString('ja-JP', { weekday: 'long' });
+    $('#plannerWeekday').textContent = plannerMode === 'month' ? 'MONTH OVERVIEW' : plannerMode === 'week' ? 'WEEKLY COCKPIT' : `${localizedWeekday}${plannerDate === todayKey() ? ` · ${tr('今日').toUpperCase()}` : ''}`;
+    $('#plannerDateLabel').textContent = plannerMode === 'month'
+      ? (i18n?.formatDate(date, { year: 'numeric', month: 'long' }) || date.toLocaleDateString('ja-JP', { year: 'numeric', month: 'long' }))
+      : plannerMode === 'week'
+        ? `${i18n?.formatDate(parseLocalDate(week[0]), { month: 'short', day: 'numeric' }) || week[0].replaceAll('-', '/')} — ${i18n?.formatDate(weekEnd, { month: 'short', day: 'numeric' }) || `${weekEnd.getMonth() + 1}/${weekEnd.getDate()}`}`
+        : (i18n?.formatDate(date, { year: 'numeric', month: 'long', day: 'numeric' }) || date.toLocaleDateString('ja-JP'));
     $('#plannerDateInput').value = plannerDate;
 
     const items = state.planItems.filter((item) => item.date === plannerDate).sort((a, b) => a.time.localeCompare(b.time));
@@ -1269,7 +1283,7 @@
     due.forEach((item) => {
       item.reminderSentAt = now.toISOString();
       if (state.settings.notifications) {
-        window.asteria.notify(`ASTERIA — ${item.title}`, Number(item.reminderMinutes) ? `${item.reminderMinutes}分後に予定が始まります。` : '予定の開始時刻です。');
+        window.asteria.notify(`ASTERIA — ${item.title}`, tr(Number(item.reminderMinutes) ? `${item.reminderMinutes}分後に予定が始まります。` : '予定の開始時刻です。'));
       }
       showToast('SCHEDULE SIGNAL', `${item.time} · ${item.title}`);
     });
@@ -1371,8 +1385,11 @@
 
   function renderNoteMeta() {
     const text = state.notes || '';
-    $('#noteCount').textContent = `${text.length.toLocaleString('ja-JP')}文字`;
-    $('#fullNoteStats').textContent = `${text.length.toLocaleString('ja-JP')}文字 · ${text ? text.split('\n').length : 0}行`;
+    const localizedLength = i18n?.formatNumber(text.length) || text.length.toLocaleString('ja-JP');
+    const lineCount = text ? text.split('\n').length : 0;
+    const localizedLines = i18n?.formatNumber(lineCount) || lineCount.toLocaleString('ja-JP');
+    $('#noteCount').textContent = `${localizedLength}文字`;
+    $('#fullNoteStats').textContent = `${localizedLength}文字 · ${localizedLines}行`;
   }
 
   function renderNotePreview() {
@@ -1475,7 +1492,7 @@
         completed: true
       });
       showToast('FOCUS COMPLETE', `${Math.round(focus.total / 60)}分の集中を記録しました。`);
-      if (state.settings.notifications) window.asteria.notify('ASTERIA — Focus complete', '集中セッションが完了しました。少し休みましょう。');
+      if (state.settings.notifications) window.asteria.notify('ASTERIA — Focus complete', tr('集中セッションが完了しました。少し休みましょう。'));
       checkAchievements();
       focus.phase = 'break';
       focus.total = focus.breakMinutes * 60;
@@ -1485,7 +1502,7 @@
       renderStats();
     } else {
       showToast('BREAK COMPLETE', '次の集中軌道へ戻る準備ができました。');
-      if (state.settings.notifications) window.asteria.notify('ASTERIA — Break complete', '休憩が終わりました。次のセッションを始められます。');
+      if (state.settings.notifications) window.asteria.notify('ASTERIA — Break complete', tr('休憩が終わりました。次のセッションを始められます。'));
       focus.phase = 'focus';
       focus.total = focus.minutes * 60;
       focus.remaining = focus.total;
@@ -1738,6 +1755,7 @@
     $('#settingAccentColor').value = state.settings.accentColor || themeSeeds.violet;
     $('#accentColorValue').value = (state.settings.accentColor || themeSeeds.violet).toUpperCase();
     $('#settingMotionIntensity').value = state.settings.motionIntensity || 'expressive';
+    $('#settingLocale').value = state.settings.locale || 'system';
     $('#settingNotifications').checked = Boolean(state.settings.notifications);
     $('#settingReducedMotion').checked = Boolean(state.settings.reducedMotion);
     $('#settingCloseToTray').checked = Boolean(state.settings.closeToTray);
@@ -1766,6 +1784,8 @@
     state.settings.weeklyGoal = Math.min(50, Math.max(1, Number($('#settingGoal').value) || 12));
     state.settings.customFocusMinutes = Math.min(180, Math.max(5, Number($('#settingCustomFocus').value) || 40));
     state.settings.motionIntensity = $('#settingMotionIntensity').value;
+    const previousLocale = state.settings.locale || 'system';
+    state.settings.locale = $('#settingLocale').value;
     state.settings.notifications = $('#settingNotifications').checked;
     state.settings.reducedMotion = $('#settingReducedMotion').checked;
     state.settings.closeToTray = $('#settingCloseToTray').checked;
@@ -1776,6 +1796,7 @@
       persistFocusRuntime();
     }
     applyDisplayPreferences();
+    if (previousLocale !== state.settings.locale) i18n?.setLocale(state.settings.locale);
     renderHeader();
     renderStats();
     scheduleSave();
@@ -1832,10 +1853,10 @@
       <div class="automation-card-head"><span class="automation-mark">${rule.builtin ? '✦' : '⌁'}</span><div><p class="panel-label">${rule.builtin ? 'ASTERIA RULE' : 'CUSTOM RULE'}</p><h3>${escapeHtml(rule.name)}</h3></div><button type="button" class="rule-toggle ${rule.enabled ? 'active' : ''}" data-auto-toggle="${escapeHtml(rule.id)}" aria-pressed="${String(rule.enabled)}" aria-label="${escapeHtml(rule.name)}を${rule.enabled ? '無効' : '有効'}にする"><i></i></button></div>
       <p class="automation-description">${escapeHtml(rule.description || '指定した条件と処理をローカルで実行します。')}</p>
       <div class="rule-flow"><span>${escapeHtml(automationConditionLabels[rule.condition] || rule.condition)}</span><b>→</b><span>${escapeHtml(automationActionLabels[rule.action] || rule.action)}</span></div>
-      <footer><span>${rule.lastRunAt ? `最終 ${escapeHtml(new Date(rule.lastRunAt).toLocaleString('ja-JP', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }))}` : '未実行'} · ${Number(rule.runCount || 0)} RUNS</span><div>${rule.builtin ? '' : `<button type="button" class="icon-text-button danger" data-auto-delete="${escapeHtml(rule.id)}">削除</button>`}<button type="button" class="text-button" data-auto-run="${escapeHtml(rule.id)}">今すぐ実行</button></div></footer>
+      <footer><span>${rule.lastRunAt ? `最終 ${escapeHtml(i18n?.formatDate(new Date(rule.lastRunAt), { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }) || new Date(rule.lastRunAt).toLocaleString('ja-JP'))}` : '未実行'} · ${Number(rule.runCount || 0)} RUNS</span><div>${rule.builtin ? '' : `<button type="button" class="icon-text-button danger" data-auto-delete="${escapeHtml(rule.id)}">削除</button>`}<button type="button" class="text-button" data-auto-run="${escapeHtml(rule.id)}">今すぐ実行</button></div></footer>
     </article>`).join('') || '<div class="panel empty-state"><span>自動化ルールがありません。</span></div>';
     const history = state.automations?.history || [];
-    $('#automationHistory').innerHTML = history.length ? history.slice(0, 10).map((entry) => `<div class="automation-history-row"><span class="run-signal ${entry.count ? 'changed' : ''}">${entry.count ? '✓' : '–'}</span><div><strong>${escapeHtml(entry.ruleName)}</strong><small>${escapeHtml(automationActionLabels[entry.action] || entry.action)} · ${Number(entry.count || 0)}件更新</small></div><time>${escapeHtml(new Date(entry.at).toLocaleString('ja-JP', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }))}</time></div>`).join('') : '<div class="empty-state automation-empty"><div><strong>実行履歴はまだありません</strong><span>ルールは手動実行、または有効化後の起動時に動きます。</span></div></div>';
+    $('#automationHistory').innerHTML = history.length ? history.slice(0, 10).map((entry) => `<div class="automation-history-row"><span class="run-signal ${entry.count ? 'changed' : ''}">${entry.count ? '✓' : '–'}</span><div><strong>${escapeHtml(entry.ruleName)}</strong><small>${escapeHtml(automationActionLabels[entry.action] || entry.action)} · ${Number(entry.count || 0)}件更新</small></div><time>${escapeHtml(i18n?.formatDate(new Date(entry.at), { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }) || new Date(entry.at).toLocaleString('ja-JP'))}</time></div>`).join('') : '<div class="empty-state automation-empty"><div><strong>実行履歴はまだありません</strong><span>ルールは手動実行、または有効化後の起動時に動きます。</span></div></div>';
   }
 
   function handleAutomationAction(event) {
@@ -1998,7 +2019,7 @@
     $('#healthScore').textContent = report.score;
     $('#healthRing').style.setProperty('--health-score', `${report.score * 3.6}deg`);
     $('#healthSummary').textContent = report.summary;
-    $('#healthScanTime').textContent = state.diagnostics?.lastScanAt ? `最終スキャン ${new Date(state.diagnostics.lastScanAt).toLocaleString('ja-JP')}` : 'リアルタイムのプレビュー。結果を保存するにはスキャンしてください。';
+    $('#healthScanTime').textContent = state.diagnostics?.lastScanAt ? `最終スキャン ${i18n?.formatDate(new Date(state.diagnostics.lastScanAt), { dateStyle: 'short', timeStyle: 'short' }) || new Date(state.diagnostics.lastScanAt).toLocaleString('ja-JP')}` : 'リアルタイムのプレビュー。結果を保存するにはスキャンしてください。';
     $('#diagnosticList').innerHTML = report.issues.length ? report.issues.map((issue) => `<article class="panel diagnostic-card ${escapeHtml(issue.severity)}" data-issue-id="${escapeHtml(issue.id)}"><span class="diagnostic-signal">${issue.severity === 'error' ? '!' : issue.severity === 'attention' ? '△' : 'i'}</span><div><p class="panel-label">${escapeHtml(issue.severity.toUpperCase())} · ${issue.count}</p><h3>${escapeHtml(issue.title)}</h3><p>${escapeHtml(issue.detail)}</p></div>${issue.fix ? `<button type="button" class="secondary-button" data-diagnostic-fix="${escapeHtml(issue.id)}">安全に修復</button>` : '<span class="review-badge">REVIEW</span>'}</article>`).join('') : '<article class="panel healthy-state"><span>✓</span><div><p class="panel-label">ALL SYSTEMS NOMINAL</p><h3>ワークスペースは健全です</h3><p>重複、壊れた参照、予定の重なりは見つかりませんでした。</p></div></article>';
   }
 
@@ -2113,7 +2134,7 @@
     $('#transferCount').textContent = history.length;
     $('#transferHistory').innerHTML = history.length ? history.slice(0, 12).map((entry) => {
       const date = new Date(entry.at);
-      const timestamp = Number.isNaN(date.getTime()) ? '' : date.toLocaleString('ja-JP', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+      const timestamp = Number.isNaN(date.getTime()) ? '' : (i18n?.formatDate(date, { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }) || date.toLocaleString('ja-JP'));
       return `<div class="transfer-row"><span class="transfer-direction ${entry.direction}">${entry.direction === 'import' ? '⇩' : '⇧'}</span><div><strong>${escapeHtml(entry.service)}</strong><small>${escapeHtml(entry.fileName || entry.format)}</small></div><span class="transfer-format">${escapeHtml(String(entry.format).toUpperCase())}</span><time>${escapeHtml(timestamp)}</time></div>`;
     }).join('') : '<div class="empty-state transfer-empty"><div><strong>交換履歴はまだありません</strong><span>サービスカードから最初のデータブリッジを開始できます。</span></div></div>';
   }
