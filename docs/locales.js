@@ -105,7 +105,11 @@
   ];
 
   const localized = Object.fromEntries(locales.map((locale) => [locale, new Map()]));
-  coreRows.forEach((row) => locales.forEach((locale, index) => localized[locale].set(row[0], row[index] || row[1])));
+  coreRows.forEach((row) => locales.forEach((locale, index) => {
+    const translation = row[index] || row[1];
+    localized[locale].set(row[0], translation);
+    localized[locale].set(row[1], translation);
+  }));
   const textMemory = new WeakMap();
   const attrMemory = new WeakMap();
   let selected = 'system';
