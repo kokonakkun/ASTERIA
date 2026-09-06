@@ -1,0 +1,46 @@
+# Dependencies
+node_modules/
+
+# Build output and packages
+dist/
+dist-*/
+release/
+*.exe
+*.blockmap
+builder-debug.yml
+builder-effective-config.yaml
+
+# Electron / Chromium test profiles
+*-profile/
+smoke-profile*/
+timer-restore-profile/
+visual-qa-*/
+ui11-profile/
+migration-profile/
+packaged-migration-profile/
+focus-clean-profile/
+work/
+
+# Generated screenshots kept outside docs/assets
+/*.png
+
+# Runtime data
+asteria-data.json
+asteria-data.backup.json
+
+# Logs and coverage
+*.log
+coverage/
+.nyc_output/
+
+# Editors and operating systems
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# Environment files and local secrets
+.env
+.env.*
+!.env.example

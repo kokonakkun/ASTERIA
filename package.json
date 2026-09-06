@@ -1,0 +1,51 @@
+{
+  "name": "asteria-command-center",
+  "version": "4.0.0",
+  "description": "ASTERIA - an offline personal command center for Windows",
+  "main": "src/main.js",
+  "author": "ASTERIA Studio",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "test": "node --test tests/*.test.js",
+    "build:portable": "electron-builder --win portable --x64",
+    "build": "electron-builder --win portable nsis --x64"
+  },
+  "devDependencies": {
+    "electron": "^38.1.2",
+    "electron-builder": "^26.0.12"
+  },
+  "build": {
+    "appId": "studio.asteria.commandcenter",
+    "productName": "ASTERIA",
+    "copyright": "Copyright © 2026 ASTERIA Studio",
+    "directories": {
+      "output": "dist",
+      "buildResources": "assets"
+    },
+    "files": [
+      "src/**/*",
+      "assets/**/*",
+      "package.json"
+    ],
+    "asar": true,
+    "compression": "maximum",
+    "win": {
+      "icon": "assets/icon.ico",
+      "artifactName": "ASTERIA-${version}-${arch}.${ext}",
+      "target": [
+        "portable"
+      ]
+    },
+    "portable": {
+      "artifactName": "ASTERIA-${version}-portable.exe",
+      "requestExecutionLevel": "user"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    }
+  }
+}
